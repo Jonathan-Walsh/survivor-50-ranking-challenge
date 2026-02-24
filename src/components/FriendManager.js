@@ -8,7 +8,13 @@ const { useState } = window.preactHooks;
 
 import { addFriend, removeFriend, decodeFriendCode } from '../state.js';
 
-export function FriendManager({ friends, onFriendAdded, onFriendSelected, selectedFriend }) {
+export function FriendManager({
+  friends,
+  onFriendAdded,
+  onFriendSelected,
+  selectedFriend,
+  showList = true,
+}) {
   const [friendCode, setFriendCode] = useState('');
   const [friendName, setFriendName] = useState('');
   const [error, setError] = useState(null);
@@ -52,7 +58,7 @@ export function FriendManager({ friends, onFriendAdded, onFriendSelected, select
   return h(
     'div',
     { className: 'friend-manager' },
-    h('h3', null, 'Friends'),
+    h('h3', null, 'Add Friend'),
     h(
       'form',
       { onSubmit: handleAddFriend, className: 'friend-form' },
@@ -72,7 +78,7 @@ export function FriendManager({ friends, onFriendAdded, onFriendSelected, select
       error && h('div', { className: 'error-message' }, error),
       h('button', { type: 'submit', className: 'btn btn-secondary btn-small' }, 'Add')
     ),
-    friends && friends.length > 0 && h(
+    showList && friends && friends.length > 0 && h(
       'ul',
       { className: 'friends-list' },
       friends.map((friend) =>
@@ -81,7 +87,7 @@ export function FriendManager({ friends, onFriendAdded, onFriendSelected, select
           {
             key: friend.code,
             className: `friend-item ${selectedFriend && selectedFriend.code === friend.code ? 'friend-selected' : ''}`,
-            onClick: () => onFriendSelected(friend),
+            onClick: () => onFriendSelected && onFriendSelected(friend),
           },
           h('span', { className: 'friend-name' }, friend.name),
           h('span', { className: 'friend-view-hint' }, 'view picks'),

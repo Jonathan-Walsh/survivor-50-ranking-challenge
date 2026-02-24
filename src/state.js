@@ -170,8 +170,15 @@ export function copyPlayerCodeToClipboard() {
     throw new Error('No prediction code to copy');
   }
 
-  // Build shareable URL
-  const shareUrl = `${window.location.origin}${window.location.pathname}#p=${params.p}&n=${params.n || 'Player'}`;
+  // Build shareable URL with full persisted state (player + friends)
+  const hashParams = new URLSearchParams();
+  hashParams.set('p', params.p);
+  hashParams.set('n', params.n || 'Player');
+  if (params.f) {
+    hashParams.set('f', params.f);
+  }
+
+  const shareUrl = `${window.location.origin}${window.location.pathname}#${hashParams.toString()}`;
   navigator.clipboard.writeText(shareUrl);
 
   return params.p;

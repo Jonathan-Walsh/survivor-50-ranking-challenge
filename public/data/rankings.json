@@ -1,31 +1,127 @@
 {
   "season": 50,
-  "version": 1,
-  "lastUpdated": "2026-02-23T00:00:00Z",
+  "version": 2,
+  "lastUpdated": "2026-02-24T06:07:18.936Z",
   "contestants": [
-    { "id": 1, "name": "Frank Jones", "placement": null },
-    { "id": 2, "name": "Maria Santos", "placement": null },
-    { "id": 3, "name": "Derek Chen", "placement": null },
-    { "id": 4, "name": "Aisha Williams", "placement": null },
-    { "id": 5, "name": "Tyler Brooks", "placement": null },
-    { "id": 6, "name": "Nina Patel", "placement": null },
-    { "id": 7, "name": "Jake Morrison", "placement": null },
-    { "id": 8, "name": "Carmen Rivera", "placement": null },
-    { "id": 9, "name": "Owen Hayes", "placement": null },
-    { "id": 10, "name": "Priya Sharma", "placement": null },
-    { "id": 11, "name": "Dustin Cole", "placement": null },
-    { "id": 12, "name": "Lena Zhao", "placement": null },
-    { "id": 13, "name": "Marcus Bell", "placement": null },
-    { "id": 14, "name": "Sofia Reyes", "placement": null },
-    { "id": 15, "name": "Caleb Wright", "placement": null },
-    { "id": 16, "name": "Hannah Kim", "placement": null },
-    { "id": 17, "name": "Ricky Tran", "placement": null },
-    { "id": 18, "name": "Brooke Davis", "placement": null },
-    { "id": 19, "name": "Elijah Grant", "placement": null },
-    { "id": 20, "name": "Tessa Okafor", "placement": null },
-    { "id": 21, "name": "Nolan Ruiz", "placement": null },
-    { "id": 22, "name": "Jada Thompson", "placement": null },
-    { "id": 23, "name": "Spencer Lee", "placement": null },
-    { "id": 24, "name": "Mia Novak", "placement": null }
+    {
+      "id": 1,
+      "name": "Angelina Keeley",
+      "placement": null
+    },
+    {
+      "id": 2,
+      "name": "Aubry Bracco",
+      "placement": 19
+    },
+    {
+      "id": 3,
+      "name": "Coach Wade",
+      "placement": null
+    },
+    {
+      "id": 4,
+      "name": "Charlie Davis",
+      "placement": 17
+    },
+    {
+      "id": 5,
+      "name": "Chrissy Hofbeck",
+      "placement": null
+    },
+    {
+      "id": 6,
+      "name": "Christian Hubicki",
+      "placement": null
+    },
+    {
+      "id": 7,
+      "name": "Cirie Fields",
+      "placement": null
+    },
+    {
+      "id": 8,
+      "name": "Colby Donaldson",
+      "placement": 16
+    },
+    {
+      "id": 9,
+      "name": "Dee Valladres",
+      "placement": 15
+    },
+    {
+      "id": 10,
+      "name": "Emily Flippen",
+      "placement": 24
+    },
+    {
+      "id": 11,
+      "name": "Genevieve Mushaluk",
+      "placement": 14
+    },
+    {
+      "id": 12,
+      "name": "Jenna Lewis-Dougherty",
+      "placement": null
+    },
+    {
+      "id": 13,
+      "name": "Joe Hunter",
+      "placement": null
+    },
+    {
+      "id": 14,
+      "name": "Jonathan Young",
+      "placement": 23
+    },
+    {
+      "id": 15,
+      "name": "Kamilla Karthigesu",
+      "placement": null
+    },
+    {
+      "id": 16,
+      "name": "Kyle Fraser",
+      "placement": null
+    },
+    {
+      "id": 17,
+      "name": "Mike White",
+      "placement": 22
+    },
+    {
+      "id": 18,
+      "name": "Ozzy Lusth",
+      "placement": null
+    },
+    {
+      "id": 19,
+      "name": "Q Burdette",
+      "placement": null
+    },
+    {
+      "id": 20,
+      "name": "Rick Devens",
+      "placement": 21
+    },
+    {
+      "id": 21,
+      "name": "Rizo Velovic",
+      "placement": 13
+    },
+    {
+      "id": 22,
+      "name": "Savannah Louie",
+      "placement": null
+    },
+    {
+      "id": 23,
+      "name": "Stephenie LaGrossa",
+      "placement": 20
+    },
+    {
+      "id": 24,
+      "name": "Tiffany Ervin",
+      "placement": 18
+    }
   ]
 }

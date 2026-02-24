@@ -18,7 +18,7 @@ const TIER_ORDER = [1, 2, 3, 4, 5];
 /**
  * Tier Component (one row of the pyramid)
  */
-function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver }) {
+function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly }) {
   const tierInfo = getTierRange(tierNum);
   const spotsLeft = maxSlots - contestants.length;
 
@@ -39,8 +39,8 @@ function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver }) {
       'div',
       {
         className: `tier-slots ${contestants.length === 0 ? 'tier-slots-empty' : ''}`,
-        onDrop: (e) => onDrop(e, tierNum),
-        onDragOver,
+        onDrop: readOnly ? undefined : (e) => onDrop(e, tierNum),
+        onDragOver: readOnly ? undefined : onDragOver,
       },
       contestants.length > 0
         ? contestants.map((c) =>
@@ -49,28 +49,74 @@ function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver }) {
               id: c.id,
               name: c.name,
               imageUrl: c.imageUrl,
+              draggable: !readOnly,
               onDragStart: (e, id) => {
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', String(id));
               },
             })
           )
-        : h('div', { className: 'drop-hint' }, `Drag contestants here (${maxSlots} spots)`)
+        : h('div', { className: 'drop-hint' }, readOnly ? `No picks (${maxSlots} spots)` : `Drag contestants here (${maxSlots} spots)`)
     )
   );
 }
 
 /**
- * Build the initial tier map: everyone in the pool.
+ * Build initial tiers.
+ * If an initial permutation exists, populate tiers from placement order.
  */
-function buildInitialTiers(contestants) {
+function buildInitialTiers(contestants, initialPermutation = null) {
+  if (!initialPermutation || initialPermutation.length === 0) {
+    return {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      pool: contestants.map((c) => c.id),
+    };
+  }
+
+  const validIds = new Set(contestants.map((c) => c.id));
+  const seen = new Set();
+  const orderedIds = [];
+
+  for (const id of initialPermutation) {
+    if (!validIds.has(id) || seen.has(id)) continue;
+    seen.add(id);
+    orderedIds.push(id);
+  }
+
+  for (const c of contestants) {
+    if (!seen.has(c.id)) orderedIds.push(c.id);
+  }
+
+  const tier1Count = getTierRange(1).count;
+  const tier2Count = getTierRange(2).count;
+  const tier3Count = getTierRange(3).count;
+  const tier4Count = getTierRange(4).count;
+  const tier5Count = getTierRange(5).count;
+
+  let cursor = 0;
+  const tier1 = orderedIds.slice(cursor, cursor + tier1Count);
+  cursor += tier1Count;
+  const tier2 = orderedIds.slice(cursor, cursor + tier2Count);
+  cursor += tier2Count;
+  const tier3 = orderedIds.slice(cursor, cursor + tier3Count);
+  cursor += tier3Count;
+  const tier4 = orderedIds.slice(cursor, cursor + tier4Count);
+  cursor += tier4Count;
+  const tier5 = orderedIds.slice(cursor, cursor + tier5Count);
+  cursor += tier5Count;
+  const pool = orderedIds.slice(cursor);
+
   return {
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    pool: contestants.map((c) => c.id),
+    1: tier1,
+    2: tier2,
+    3: tier3,
+    4: tier4,
+    5: tier5,
+    pool,
   };
 }
 
@@ -90,8 +136,8 @@ function tiersToPermutation(tierMap) {
 /**
  * Main Pyramid Component
  */
-export function Pyramid({ contestants, onPermutationChange }) {
-  const [tierMap, setTierMap] = useState(() => buildInitialTiers(contestants));
+export function Pyramid({ contestants, onPermutationChange, initialPermutation, readOnly = false, title = 'Your Predictions' }) {
+  const [tierMap, setTierMap] = useState(() => buildInitialTiers(contestants, initialPermutation));
 
   // Lookup table: id → contestant object
   const contestantById = {};
@@ -99,8 +145,10 @@ export function Pyramid({ contestants, onPermutationChange }) {
 
   // Whenever tierMap changes, push a fresh permutation up to parent
   useEffect(() => {
-    onPermutationChange(tiersToPermutation(tierMap));
-  }, [tierMap]);
+    if (onPermutationChange) {
+      onPermutationChange(tiersToPermutation(tierMap));
+    }
+  }, [tierMap, onPermutationChange]);
 
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
@@ -138,7 +186,7 @@ export function Pyramid({ contestants, onPermutationChange }) {
     'div',
     { className: 'pyramid' },
     h('div', { className: 'pyramid-header' },
-      h('h2', null, 'Your Predictions')
+      h('h2', null, title)
     ),
     h(
       'div',
@@ -152,10 +200,11 @@ export function Pyramid({ contestants, onPermutationChange }) {
           maxSlots: range.count,
           onDrop: handleDrop,
           onDragOver: handleDragOver,
+          readOnly,
         });
       })
     ),
-    h(
+    !readOnly && h(
       'div',
       { className: 'tier tier-pool' },
       h('div', { className: 'tier-label' },

@@ -5,13 +5,13 @@
 
 const { h } = window.preact;
 
-export function ContestantCard({ id, name, imageUrl, onDragStart, isDragging }) {
+export function ContestantCard({ id, name, imageUrl, onDragStart, isDragging, draggable = true }) {
   return h(
     'div',
     {
       className: `contestant-card ${isDragging ? 'dragging' : ''}`,
-      draggable: true,
-      onDragStart: (e) => onDragStart(e, id),
+      draggable,
+      onDragStart: draggable && onDragStart ? (e) => onDragStart(e, id) : undefined,
       'data-contestant-id': id,
     },
     h('div', { className: 'contestant-image' },

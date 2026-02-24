@@ -504,12 +504,11 @@ body {
 .leaderboard {
   background: var(--white);
   border-radius: 8px;
-  overflow: hidden;
 }
 
-.leaderboard h2 {
+.leaderboard h3 {
   font-size: 1rem;
-  padding: 0 0 8px;
+  margin-bottom: 8px;
 }
 
 .leaderboard-loading,
@@ -521,31 +520,42 @@ body {
 }
 
 .leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
 }
 
-.leaderboard-header {
-  display: grid;
-  grid-template-columns: 40px 1fr 60px;
-  padding: 6px 12px;
+.leaderboard-table thead th {
+  text-align: left;
+  padding: 8px 10px;
   background: var(--sand);
   font-weight: 600;
   font-size: 0.8rem;
+  border-bottom: 1px solid var(--sand-dark);
 }
 
 .leaderboard-row {
-  display: grid;
-  grid-template-columns: 40px 1fr 60px;
-  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.leaderboard-row td {
+  padding: 8px 10px;
   font-size: 0.85rem;
   border-top: 1px solid var(--bg);
 }
 
-.col-rank { text-align: center; }
 .col-score { text-align: right; }
-.score-value { font-weight: 600; }
+
+.leaderboard-row:hover td {
+  background: var(--bg);
+}
+
+.leaderboard-row-active td {
+  background: var(--sand-light);
+  font-weight: 600;
+}
 
 /* Instructions */
 .btn-instructions {

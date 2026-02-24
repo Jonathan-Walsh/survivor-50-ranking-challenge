@@ -6,6 +6,17 @@
  */
 
 const BASE62_CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const PERMUTATION_SIZE = 24;
+
+function factorial(n) {
+  let result = 1n;
+  for (let i = 2; i <= n; i++) {
+    result *= BigInt(i);
+  }
+  return result;
+}
+
+const FACTORIAL_24 = factorial(PERMUTATION_SIZE);
 
 /**
  * Convert a permutation array [5, 12, 3, ...] to factorial number system representation
@@ -15,40 +26,29 @@ const BASE62_CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV
  * @returns {bigint} - Factorial number representation as integer
  */
 export function permutationToFactorial(permutation) {
-  if (permutation.length !== 24) {
-    throw new Error('Permutation must have exactly 24 elements');
+  if (permutation.length !== PERMUTATION_SIZE) {
+    throw new Error(`Permutation must have exactly ${PERMUTATION_SIZE} elements`);
   }
 
   // Validate that it's a valid permutation
   const sorted = [...permutation].sort((a, b) => a - b);
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < PERMUTATION_SIZE; i++) {
     if (sorted[i] !== i + 1) {
-      throw new Error('Invalid permutation: must contain each number 1-24 exactly once');
+      throw new Error(`Invalid permutation: must contain each number 1-${PERMUTATION_SIZE} exactly once`);
     }
   }
 
-  // Convert permutation to factorial number system
-  let factoradic = [];
-  let remaining = [...permutation];
-
-  for (let i = 0; i < 24; i++) {
-    // Find the index of the smallest remaining element
-    const element = permutation[i];
-    let index = 0;
-    for (let j = 0; j < remaining.length; j++) {
-      if (remaining[j] === element) {
-        index = j;
-        break;
-      }
-    }
-    factoradic.push(index);
-    remaining.splice(index, 1);
-  }
-
-  // Convert factorial number system to integer
+  // Lehmer code: pick each element's index in the remaining sorted domain.
+  const remaining = Array.from({ length: PERMUTATION_SIZE }, (_, i) => i + 1);
   let result = 0n;
-  for (let i = 0; i < 24; i++) {
-    result = result * BigInt(24 - i) + BigInt(factoradic[i]);
+  for (let i = 0; i < PERMUTATION_SIZE; i++) {
+    const element = permutation[i];
+    const index = remaining.indexOf(element);
+    if (index === -1) {
+      throw new Error('Invalid permutation: duplicate or missing element');
+    }
+    result = result * BigInt(PERMUTATION_SIZE - i) + BigInt(index);
+    remaining.splice(index, 1);
   }
 
   return result;
@@ -61,25 +61,28 @@ export function permutationToFactorial(permutation) {
  * @returns {number[]} - Permutation array [1-24]
  */
 export function factorialToPermutation(factorial) {
-  let remaining = Array.from({ length: 24 }, (_, i) => i + 1);
-  let factoradic = [];
-
-  // Extract factorial digits
-  let num = factorial;
-  for (let i = 0; i < 24; i++) {
-    const divisor = BigInt(24 - i);
-    const digit = Number(num % divisor);
-    factoradic.push(digit);
-    num = num / divisor;
+  if (typeof factorial !== 'bigint' || factorial < 0n || factorial >= FACTORIAL_24) {
+    throw new Error('Invalid factorial value: out of range for 24-element permutations');
   }
 
-  // Reverse to get original order
+  const remaining = Array.from({ length: PERMUTATION_SIZE }, (_, i) => i + 1);
+  const factoradic = [];
+  let num = factorial;
+
+  // Extract mixed-radix digits with bases 1..N, then reverse.
+  for (let i = 1; i <= PERMUTATION_SIZE; i++) {
+    const base = BigInt(i);
+    factoradic.push(Number(num % base));
+    num = num / base;
+  }
   factoradic.reverse();
 
-  // Reconstruct permutation from factoradic
-  let result = [];
-  for (let i = 0; i < 24; i++) {
+  const result = [];
+  for (let i = 0; i < PERMUTATION_SIZE; i++) {
     const index = factoradic[i];
+    if (index >= remaining.length) {
+      throw new Error('Invalid factorial value: digit out of bounds');
+    }
     result.push(remaining[index]);
     remaining.splice(index, 1);
   }
@@ -147,6 +150,9 @@ export function decodePermutation(code) {
   }
 
   const factorial = base62Decode(code);
+  if (factorial >= FACTORIAL_24) {
+    throw new Error('Invalid code: value out of range');
+  }
   return factorialToPermutation(factorial);
 }
 
