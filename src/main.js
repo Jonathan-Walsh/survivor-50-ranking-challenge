@@ -12,6 +12,7 @@ import { Pyramid } from './components/Pyramid.js';
 import { ScoreDisplay } from './components/ScoreDisplay.js';
 import { Leaderboard } from './components/Leaderboard.js';
 import { FriendManager } from './components/FriendManager.js';
+import { Instructions } from './components/Instructions.js';
 
 // Sample contestants data
 const CONTESTANTS = Array.from({ length: 24 }, (_, i) => ({
@@ -116,10 +117,10 @@ function App() {
           })
         ),
         playerCode && h('div', { className: 'player-code' },
-          h('p', null, '✅ Locked In!'),
+          h('p', null, 'Locked In'),
           h('code', null, playerCode),
           h('button', { className: 'btn btn-secondary', onClick: handleCopyCode },
-            '📋 Copy Link'
+            'Copy Link'
           )
         )
       ),
@@ -130,7 +131,7 @@ function App() {
       }),
       h('div', { className: 'control-panel' },
         h('button', { className: 'btn btn-primary', onClick: handleLockIn },
-          '🔒 Lock In Predictions'
+          'Lock In Predictions'
         )
       ),
       gameState && playerCode && h(Leaderboard, {
@@ -150,8 +151,9 @@ function App() {
       })
     ),
     h('footer', { className: 'footer' },
-      h('p', null, '✅ Phase 4 Complete: Leaderboard & Friends | Total Points: 48')
-    )
+      h('p', null, 'Survivor 50 Fantasy League')
+    ),
+    h(Instructions)
   );
 }
 

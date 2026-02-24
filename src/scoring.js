@@ -140,14 +140,14 @@ export async function fetchRankings() {
  */
 export function getScoreTier(score) {
   if (score >= 40) {
-    return { tier: 'S', message: '🏆 Champion Level' };
+    return { tier: 'S', message: 'Champion' };
   } else if (score >= 30) {
-    return { tier: 'A', message: '⭐ Excellent' };
+    return { tier: 'A', message: 'Excellent' };
   } else if (score >= 20) {
-    return { tier: 'B', message: '👍 Good' };
+    return { tier: 'B', message: 'Good' };
   } else if (score >= 10) {
-    return { tier: 'C', message: '🙂 Fair' };
+    return { tier: 'C', message: 'Fair' };
   } else {
-    return { tier: 'D', message: '📚 Keep Learning' };
+    return { tier: 'D', message: 'Beginner' };
   }
 }

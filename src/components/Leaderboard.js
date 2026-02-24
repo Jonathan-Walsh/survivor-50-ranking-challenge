@@ -46,19 +46,19 @@ export function Leaderboard({ playerName, playerCode, friends, permutation }) {
   }, [playerName, playerCode, friends, permutation]);
 
   if (loading || !standings) {
-    return h('div', { className: 'leaderboard-loading' }, '📊 Loading leaderboard...');
+    return h('div', { className: 'leaderboard-loading' }, 'Loading leaderboard...');
   }
 
   if (standings.length === 0) {
     return h('div', { className: 'leaderboard-empty' },
-      'No scores to display yet. Lock in your predictions!'
+      'No scores to display. Lock in your predictions first.'
     );
   }
 
   return h(
     'div',
     { className: 'leaderboard' },
-    h('h2', null, '🏆 Leaderboard'),
+    h('h2', null, 'Leaderboard'),
     h(
       'div',
       { className: 'leaderboard-table' },
@@ -72,7 +72,7 @@ export function Leaderboard({ playerName, playerCode, friends, permutation }) {
       standings.map((player, index) =>
         h('div', { className: 'leaderboard-row', key: player.code || index },
           h('div', { className: 'col-rank' },
-            index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`
+            `#${index + 1}`
           ),
           h('div', { className: 'col-name' },
             h('span', { className: 'player-name' }, player.name)

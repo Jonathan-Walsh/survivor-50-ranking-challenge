@@ -59,8 +59,9 @@ function Tier({ tierNum, contestants, onDrop, onDragOver }) {
 export function Pyramid({ permutation, contestants, onPermutationChange }) {
   const [draggedId, setDraggedId] = useState(null);
   const [pyramidState, setPyramidState] = useState(null);
+  const [placedContestants, setPlacedContestants] = useState(new Set());
 
-  // Build pyramid layout from permutation
+  // Build pyramid layout from permutation and placedContestants tracking
   useEffect(() => {
     // Create 6 tiers (winner, final 2, final 3, top 6, bottom 12, unranked pool)
     const tiers = {
@@ -72,27 +73,38 @@ export function Pyramid({ permutation, contestants, onPermutationChange }) {
       6: [], // Unranked pool (all remaining)
     };
 
-    // Map permutation indices to tiers
-    // Permutation[i] = contestant ID at placement i+1
-    // So permutation[0] = winner, permutation[1] = runner-up, etc.
-    for (let i = 0; i < permutation.length; i++) {
+    // Build tiers only for placed contestants
+    let tierIndex = 0;
+    for (let i = 0; i < permutation.length && tierIndex < 24; i++) {
       const contestantId = permutation[i];
+
+      // Skip if this contestant hasn't been explicitly placed
+      if (!placedContestants.has(contestantId)) continue;
+
       let tier = 6; // Default to unranked
 
-      if (i === 0) tier = 1; // Winner
-      else if (i <= 2) tier = 2; // Final 2
-      else if (i <= 5) tier = 3; // Final 3
-      else if (i <= 11) tier = 4; // Top 6
-      else if (i <= 23) tier = 5; // Bottom 12
+      if (tierIndex === 0) tier = 1; // Winner
+      else if (tierIndex <= 2) tier = 2; // Final 2
+      else if (tierIndex <= 5) tier = 3; // Final 3
+      else if (tierIndex <= 11) tier = 4; // Top 6
+      else if (tierIndex <= 23) tier = 5; // Bottom 12
 
       const contestant = contestants.find((c) => c.id === contestantId);
       if (contestant) {
         tiers[tier].push(contestant);
       }
+      tierIndex++;
+    }
+
+    // Add all unplaced contestants to unranked pool
+    for (const contestant of contestants) {
+      if (!placedContestants.has(contestant.id)) {
+        tiers[6].push(contestant);
+      }
     }
 
     setPyramidState(tiers);
-  }, [permutation, contestants]);
+  }, [permutation, contestants, placedContestants]);
 
   const handleDrop = (e, targetTier) => {
     e.preventDefault();
@@ -104,6 +116,16 @@ export function Pyramid({ permutation, contestants, onPermutationChange }) {
     // Remove from current position in permutation
     let newPerm = permutation.filter((id) => id !== contestantId);
 
+    // Update placement tracking
+    let newPlaced = new Set(placedContestants);
+    if (targetTier !== 6) {
+      // Moving to a tier = placing
+      newPlaced.add(contestantId);
+    } else {
+      // Moving to unranked = removing from placement
+      newPlaced.delete(contestantId);
+    }
+
     // Get tier ranges
     const tierRange = getTierRange(targetTier);
     const currentTierSize = pyramidState[targetTier].length;
@@ -114,16 +136,26 @@ export function Pyramid({ permutation, contestants, onPermutationChange }) {
       return;
     }
 
-    // Calculate insertion position based on target tier
+    // Calculate insertion position based on target tier and placement tracking
     let insertPos = 0;
-    if (targetTier === 1) insertPos = 0; // Winner
-    else if (targetTier === 2) insertPos = 1 + currentTierSize; // After winner
-    else if (targetTier === 3) insertPos = 3 + currentTierSize; // After final 2
-    else if (targetTier === 4) insertPos = 6 + currentTierSize; // After final 3
-    else if (targetTier === 5) insertPos = 12 + currentTierSize; // After top 6
-    else insertPos = newPerm.length; // End for unranked
+    if (targetTier !== 6) {
+      // For tiers, count only placed contestants
+      let placedInTier = 0;
+      for (const id of newPerm) {
+        if (newPlaced.has(id)) placedInTier++;
+      }
+
+      if (targetTier === 1) insertPos = 0;
+      else if (targetTier === 2) insertPos = 1 + (pyramidState[2] ? pyramidState[2].length : 0);
+      else if (targetTier === 3) insertPos = 3 + (pyramidState[3] ? pyramidState[3].length : 0);
+      else if (targetTier === 4) insertPos = 6 + (pyramidState[4] ? pyramidState[4].length : 0);
+      else if (targetTier === 5) insertPos = 12 + (pyramidState[5] ? pyramidState[5].length : 0);
+    } else {
+      insertPos = newPerm.length; // End for unranked
+    }
 
     newPerm.splice(insertPos, 0, contestantId);
+    setPlacedContestants(newPlaced);
     onPermutationChange(newPerm);
   };
 
@@ -140,8 +172,7 @@ export function Pyramid({ permutation, contestants, onPermutationChange }) {
     'div',
     { className: 'pyramid' },
     h('div', { className: 'pyramid-header' },
-      h('h2', null, 'Your Predictions'),
-      h('p', null, 'Drag contestants into the pyramid by predicted placement')
+      h('h2', null, 'Your Predictions')
     ),
     h(
       'div',

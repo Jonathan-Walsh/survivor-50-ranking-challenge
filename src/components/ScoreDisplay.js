@@ -26,7 +26,7 @@ export function ScoreDisplay({ permutation }) {
   }, [permutation]);
 
   if (loading || !scoreData) {
-    return h('div', { className: 'score-loading' }, '📊 Loading scores...');
+    return h('div', { className: 'score-loading' }, 'Loading scores...');
   }
 
   const tier = getScoreTier(scoreData.currentScore);
@@ -45,25 +45,12 @@ export function ScoreDisplay({ permutation }) {
         h('div', { className: 'score-label' }, 'Maximum Points')
       )
     ),
-    h('div', { className: 'score-progress' },
-      h('div', { className: 'progress-bar' },
-        h('div', {
-          className: 'progress-fill',
-          style: {
-            width: `${(scoreData.currentScore / scoreData.maxPossibleScore * 100).toFixed(1)}%`,
-          },
-        })
-      ),
-      h('div', { className: 'progress-text' },
-        `${scoreData.accuracy}% Accuracy`
-      )
-    ),
     h('div', { className: 'score-tier' },
       h('span', { className: 'tier-badge' }, tier.tier),
       h('span', { className: 'tier-message' }, tier.message)
     ),
     scoreData.potentialRemaining > 0 && h('div', { className: 'score-potential' },
-      h('p', null, `💡 ${scoreData.potentialRemaining} points still available`)
+      h('p', null, `${scoreData.potentialRemaining} points still available`)
     )
   );
 }

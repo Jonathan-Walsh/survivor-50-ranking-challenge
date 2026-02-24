@@ -61,7 +61,7 @@ export function FriendManager({ friends, onFriendAdded }) {
   return h(
     'div',
     { className: 'friend-manager' },
-    h('h3', null, '👥 Manage Friends'),
+    h('h3', null, 'Manage Friends'),
     h(
       'form',
       { onSubmit: handleAddFriend, className: 'friend-form' },
@@ -90,7 +90,7 @@ export function FriendManager({ friends, onFriendAdded }) {
       ),
       error && h('div', { className: 'error-message' }, error),
       h('button', { type: 'submit', className: 'btn btn-secondary' },
-        '➕ Add Friend'
+        'Add Friend'
       )
     ),
     friends && friends.length > 0 && h(
@@ -112,7 +112,7 @@ export function FriendManager({ friends, onFriendAdded }) {
                 className: 'btn btn-small btn-danger',
                 onClick: () => handleRemoveFriend(friend.code),
               },
-              '❌'
+              'Remove'
             )
           )
         )
