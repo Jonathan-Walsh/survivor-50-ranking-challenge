@@ -1,6 +1,6 @@
 /**
  * ContestantCard Component
- * Represents a single contestant with image, name, and drag support
+ * Compact card with avatar circle and name, draggable
  */
 
 const { h } = window.preact;
@@ -17,8 +17,8 @@ export function ContestantCard({ id, name, imageUrl, onDragStart, isDragging }) 
     h('div', { className: 'contestant-image' },
       imageUrl
         ? h('img', { src: imageUrl, alt: name })
-        : h('div', { className: 'placeholder' }, `#${id}`)
+        : h('div', { className: 'placeholder' }, id)
     ),
-    h('div', { className: 'contestant-name' }, name)
+    h('span', { className: 'contestant-name' }, name)
   );
 }

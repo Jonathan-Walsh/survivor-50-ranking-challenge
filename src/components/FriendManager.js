@@ -1,6 +1,6 @@
 /**
  * FriendManager Component
- * Manage adding/removing friends to leaderboard
+ * Add friends and click to view their picks
  */
 
 const { h } = window.preact;
@@ -8,7 +8,7 @@ const { useState } = window.preactHooks;
 
 import { addFriend, removeFriend, decodeFriendCode } from '../state.js';
 
-export function FriendManager({ friends, onFriendAdded }) {
+export function FriendManager({ friends, onFriendAdded, onFriendSelected, selectedFriend }) {
   const [friendCode, setFriendCode] = useState('');
   const [friendName, setFriendName] = useState('');
   const [error, setError] = useState(null);
@@ -18,102 +18,80 @@ export function FriendManager({ friends, onFriendAdded }) {
     setError(null);
 
     if (!friendCode || friendCode.length !== 14) {
-      setError('Friend code must be exactly 14 characters');
+      setError('Code must be exactly 14 characters');
       return;
     }
 
     if (!friendName.trim()) {
-      setError('Please enter friend name');
+      setError('Please enter a name');
       return;
     }
 
     try {
-      // Verify code is decodable
       const permutation = decodeFriendCode(friendCode);
       if (!permutation) {
-        setError('Invalid friend code');
+        setError('Invalid code');
         return;
       }
 
-      // Add friend to URL
       addFriend(friendCode, friendName);
-
-      // Call callback with decoded data
-      onFriendAdded({
-        code: friendCode,
-        name: friendName,
-        permutation,
-      });
-
+      onFriendAdded({ code: friendCode, name: friendName, permutation });
       setFriendCode('');
       setFriendName('');
     } catch (err) {
-      setError('Invalid friend code');
+      setError('Invalid code');
     }
   };
 
-  const handleRemoveFriend = (code) => {
+  const handleRemoveFriend = (e, code) => {
+    e.stopPropagation();
     removeFriend(code);
-    // Force page reload to update leaderboard
     window.location.reload();
   };
 
   return h(
     'div',
     { className: 'friend-manager' },
-    h('h3', null, 'Manage Friends'),
+    h('h3', null, 'Friends'),
     h(
       'form',
       { onSubmit: handleAddFriend, className: 'friend-form' },
-      h(
-        'div',
-        { className: 'form-group' },
-        h('label', null, 'Friend Code (14 chars)'),
-        h('input', {
-          type: 'text',
-          value: friendCode,
-          onChange: (e) => setFriendCode(e.target.value),
-          placeholder: 'aBcDeFgHiJkLm',
-          maxLength: 14,
-        })
-      ),
-      h(
-        'div',
-        { className: 'form-group' },
-        h('label', null, 'Friend Name'),
-        h('input', {
-          type: 'text',
-          value: friendName,
-          onChange: (e) => setFriendName(e.target.value),
-          placeholder: 'Their name',
-        })
-      ),
+      h('input', {
+        type: 'text',
+        value: friendCode,
+        onChange: (e) => setFriendCode(e.target.value),
+        placeholder: 'Friend code (14 chars)',
+        maxLength: 14,
+      }),
+      h('input', {
+        type: 'text',
+        value: friendName,
+        onChange: (e) => setFriendName(e.target.value),
+        placeholder: 'Name',
+      }),
       error && h('div', { className: 'error-message' }, error),
-      h('button', { type: 'submit', className: 'btn btn-secondary' },
-        'Add Friend'
-      )
+      h('button', { type: 'submit', className: 'btn btn-secondary btn-small' }, 'Add')
     ),
     friends && friends.length > 0 && h(
-      'div',
+      'ul',
       { className: 'friends-list' },
-      h('h4', null, 'Added Friends'),
-      h(
-        'ul',
-        null,
-        friends.map((friend) =>
+      friends.map((friend) =>
+        h(
+          'li',
+          {
+            key: friend.code,
+            className: `friend-item ${selectedFriend && selectedFriend.code === friend.code ? 'friend-selected' : ''}`,
+            onClick: () => onFriendSelected(friend),
+          },
+          h('span', { className: 'friend-name' }, friend.name),
+          h('span', { className: 'friend-view-hint' }, 'view picks'),
           h(
-            'li',
-            { key: friend.code, className: 'friend-item' },
-            h('span', { className: 'friend-name' }, friend.name),
-            h('span', { className: 'friend-code' }, `${friend.code.slice(0, 7)}...`),
-            h(
-              'button',
-              {
-                className: 'btn btn-small btn-danger',
-                onClick: () => handleRemoveFriend(friend.code),
-              },
-              'Remove'
-            )
+            'button',
+            {
+              className: 'btn-remove',
+              onClick: (e) => handleRemoveFriend(e, friend.code),
+            },
+            '\u00d7'
           )
         )
       )
