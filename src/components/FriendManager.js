@@ -23,25 +23,28 @@ export function FriendManager({
     e.preventDefault();
     setError(null);
 
-    if (!friendCode || friendCode.length !== 14) {
+    const normalizedCode = friendCode.trim();
+    const normalizedName = friendName.trim();
+
+    if (!normalizedCode || normalizedCode.length !== 14) {
       setError('Code must be exactly 14 characters');
       return;
     }
 
-    if (!friendName.trim()) {
+    if (!normalizedName) {
       setError('Please enter a name');
       return;
     }
 
     try {
-      const permutation = decodeFriendCode(friendCode);
+      const permutation = decodeFriendCode(normalizedCode);
       if (!permutation) {
         setError('Invalid code');
         return;
       }
 
-      addFriend(friendCode, friendName);
-      onFriendAdded({ code: friendCode, name: friendName, permutation });
+      addFriend(normalizedCode, normalizedName);
+      onFriendAdded({ code: normalizedCode, name: normalizedName, permutation });
       setFriendCode('');
       setFriendName('');
     } catch (err) {

@@ -5,9 +5,16 @@
 const { h, render } = window.preact;
 const { useState, useEffect, useCallback, useRef } = window.preactHooks;
 
-import { loadPlayerPrediction, savePlayerPrediction, copyPlayerCodeToClipboard, decodeFriendCode } from './state.js';
+import {
+  savePlayerPrediction,
+  copyPlayerCodeToClipboard,
+  decodeFriendCode,
+  parseHash,
+  parseFriendCodes,
+  serializeHash,
+} from './state.js';
 import { createInitialPermutation } from './game.js';
-import { encodePermutation } from './encoding.js';
+import { decodePermutation } from './encoding.js';
 import { Pyramid } from './components/Pyramid.js';
 import { Leaderboard } from './components/Leaderboard.js';
 import { FriendManager } from './components/FriendManager.js';
@@ -15,30 +22,30 @@ import { Instructions } from './components/Instructions.js';
 import { fetchRankings } from './scoring.js';
 
 const CONTESTANTS = [
-  { id: 1, name: 'Angelina' },
-  { id: 2, name: 'Aubry' },
-  { id: 3, name: 'Coach' },
-  { id: 4, name: 'Charlie' },
-  { id: 5, name: 'Chrissy' },
-  { id: 6, name: 'Christian' },
-  { id: 7, name: 'Cirie' },
-  { id: 8, name: 'Colby' },
-  { id: 9, name: 'Dee' },
-  { id: 10, name: 'Emily' },
-  { id: 11, name: 'Genevieve' },
-  { id: 12, name: 'Jenna' },
-  { id: 13, name: 'Joe' },
-  { id: 14, name: 'Jonathan' },
-  { id: 15, name: 'Kamilla' },
-  { id: 16, name: 'Kyle' },
-  { id: 17, name: 'Mike' },
-  { id: 18, name: 'Ozzy' },
-  { id: 19, name: 'Q' },
-  { id: 20, name: 'Rick' },
-  { id: 21, name: 'Rizo' },
-  { id: 22, name: 'Savannah' },
-  { id: 23, name: 'Stephenie' },
-  { id: 24, name: 'Tiffany' },
+  { id: 1, name: 'Angelina', tribe: 'cila' },
+  { id: 2, name: 'Aubry', tribe: 'cila' },
+  { id: 3, name: 'Coach', tribe: 'cila' },
+  { id: 4, name: 'Charlie', tribe: 'cila' },
+  { id: 5, name: 'Chrissy', tribe: 'cila' },
+  { id: 6, name: 'Christian', tribe: 'cila' },
+  { id: 7, name: 'Cirie', tribe: 'cila' },
+  { id: 8, name: 'Colby', tribe: 'cila' },
+  { id: 9, name: 'Dee', tribe: 'kalo' },
+  { id: 10, name: 'Emily', tribe: 'kalo' },
+  { id: 11, name: 'Genevieve', tribe: 'kalo' },
+  { id: 12, name: 'Jenna', tribe: 'kalo' },
+  { id: 13, name: 'Joe', tribe: 'kalo' },
+  { id: 14, name: 'Jonathan', tribe: 'kalo' },
+  { id: 15, name: 'Kamilla', tribe: 'kalo' },
+  { id: 16, name: 'Kyle', tribe: 'kalo' },
+  { id: 17, name: 'Mike', tribe: 'vatu' },
+  { id: 18, name: 'Ozzy', tribe: 'vatu' },
+  { id: 19, name: 'Q', tribe: 'vatu' },
+  { id: 20, name: 'Rick', tribe: 'vatu' },
+  { id: 21, name: 'Rizo', tribe: 'vatu' },
+  { id: 22, name: 'Savannah', tribe: 'vatu' },
+  { id: 23, name: 'Stephenie', tribe: 'vatu' },
+  { id: 24, name: 'Tiffany', tribe: 'vatu' },
 ].map((c) => ({ ...c, imageUrl: null }));
 
 function App() {
@@ -47,6 +54,7 @@ function App() {
   const [playerCode, setPlayerCode] = useState(null);
   const [friends, setFriends] = useState([]);
   const [rankings, setRankings] = useState([]);
+  const [resetVersion, setResetVersion] = useState(0);
   // viewingPlayer: null = viewing own picks, otherwise { name, permutation, code }
   const [viewingPlayer, setViewingPlayer] = useState(null);
 
@@ -54,20 +62,29 @@ function App() {
   const permRef = useRef(createInitialPermutation());
 
   useEffect(() => {
-    const saved = loadPlayerPrediction();
-    if (saved) {
-      permRef.current = saved.permutation;
-      setPlayerName(saved.name);
-      const decodedFriends = saved.friends.map((f) => ({
-        ...f,
-        permutation: decodeFriendCode(f.code),
-      }));
-      setFriends(decodedFriends);
-      // Restore code
-      // Preserve original code from URL when available
-      const params = new URLSearchParams(window.location.hash.slice(1));
-      setPlayerCode(params.get('p') || (saved.permutation ? encodePermutation(saved.permutation) : null));
+    const params = parseHash();
+
+    if (params.n) {
+      setPlayerName(params.n);
     }
+
+    const parsedFriends = parseFriendCodes(params.f);
+    const decodedFriends = parsedFriends.map((f) => ({
+      ...f,
+      permutation: decodeFriendCode(f.code),
+    }));
+    setFriends(decodedFriends);
+
+    if (params.p) {
+      try {
+        permRef.current = decodePermutation(params.p);
+        setPlayerCode(params.p);
+      } catch (error) {
+        console.error('Failed to decode player code from URL:', error);
+        setPlayerCode(null);
+      }
+    }
+
     setLoading(false);
   }, []);
 
@@ -79,6 +96,17 @@ function App() {
 
   // Stable callback — Pyramid calls this on every drag
   const handlePermutationChange = useCallback((newPerm) => {
+    const samePermutation = (
+      Array.isArray(newPerm) &&
+      Array.isArray(permRef.current) &&
+      newPerm.length === permRef.current.length &&
+      newPerm.every((id, idx) => id === permRef.current[idx])
+    );
+
+    if (samePermutation) {
+      return;
+    }
+
     permRef.current = newPerm;
     setPlayerCode(null); // Clear stale code
   }, []);
@@ -89,6 +117,19 @@ function App() {
     const code = savePlayerPrediction(perm, playerName, friends);
     console.log('Generated code:', code);
     setPlayerCode(code);
+  };
+
+  const handleResetPicks = () => {
+    permRef.current = createInitialPermutation();
+    setPlayerCode(null);
+    setResetVersion((v) => v + 1);
+
+    const params = parseHash();
+    delete params.p;
+    serializeHash({
+      n: params.n || playerName,
+      f: params.f || '',
+    });
   };
 
   const handleCopyCode = async () => {
@@ -120,11 +161,11 @@ function App() {
     { name: playerName, code: playerCode, permutation: permRef.current, isSelf: true, viewKey: 'self' },
     ...friends
       .filter((f) => f.permutation && f.permutation.length === 24)
-      .map((f) => ({ ...f, isSelf: false, viewKey: `friend:${f.code}` })),
+      .map((f, index) => ({ ...f, isSelf: false, viewKey: `friend:${index}:${f.code}` })),
   ];
 
   const isViewingFriend = viewingPlayer !== null;
-  const activePermutation = isViewingFriend ? viewingPlayer.permutation : permRef.current;
+  const activePermutation = isViewingFriend ? viewingPlayer.permutation : (playerCode ? permRef.current : null);
   const pyramidTitle = isViewingFriend ? `${viewingPlayer.name}'s Picks` : 'Your Predictions';
 
   return h(
@@ -139,7 +180,7 @@ function App() {
         // Left: Pyramid (own picks or friend's read-only view)
         h('div', { className: 'layout-left' },
           h(Pyramid, {
-            key: isViewingFriend ? `friend:${viewingPlayer.code}` : 'self',
+            key: isViewingFriend ? viewingPlayer.viewKey : `self:${resetVersion}`,
             contestants: CONTESTANTS,
             onPermutationChange: isViewingFriend ? null : handlePermutationChange,
             initialPermutation: activePermutation,
@@ -169,6 +210,9 @@ function App() {
             h('button', { className: 'btn btn-primary', onClick: handleLockIn },
               'Lock In Predictions'
             ),
+            h('button', { className: 'btn btn-secondary', onClick: handleResetPicks },
+              'Reset Picks'
+            ),
             playerCode && h('div', { className: 'player-code' },
               h('p', null, 'Your code:'),
               h('code', null, playerCode),
@@ -181,7 +225,7 @@ function App() {
           h('div', { className: 'sidebar-section' },
             h(Leaderboard, {
               players: allPlayers,
-              selectedPlayerKey: isViewingFriend ? `friend:${viewingPlayer.code}` : 'self',
+              selectedPlayerKey: isViewingFriend ? viewingPlayer.viewKey : 'self',
               onSelectPlayer: (player) => player.isSelf ? handleViewPlayer(null) : handleViewPlayer(player),
             })
           ),

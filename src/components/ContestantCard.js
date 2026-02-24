@@ -5,12 +5,22 @@
 
 const { h } = window.preact;
 
-export function ContestantCard({ id, name, imageUrl, onDragStart, isDragging, draggable = true, status = null }) {
+export function ContestantCard({
+  id,
+  name,
+  imageUrl,
+  onDragStart,
+  isDragging,
+  draggable = true,
+  status = null,
+  tribe = null,
+}) {
   const statusClass = status ? `contestant-card-${status}` : '';
+  const tribeClass = tribe ? `contestant-card-tribe-${tribe}` : '';
   return h(
     'div',
     {
-      className: `contestant-card ${isDragging ? 'dragging' : ''} ${statusClass}`.trim(),
+      className: `contestant-card ${isDragging ? 'dragging' : ''} ${statusClass} ${tribeClass}`.trim(),
       draggable,
       onDragStart: draggable && onDragStart ? (e) => onDragStart(e, id) : undefined,
       'data-contestant-id': id,

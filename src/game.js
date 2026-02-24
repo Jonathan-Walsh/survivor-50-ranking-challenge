@@ -36,9 +36,9 @@ export function isValidPermutation(perm) {
  */
 export function getTierInfo(placement) {
   if (placement === 1) return { tier: 1, name: 'Winner', points: 10 };
-  if (placement >= 2 && placement <= 3) return { tier: 2, name: 'Final 2', points: 4 };
-  if (placement >= 4 && placement <= 6) return { tier: 3, name: 'Final 3', points: 3 };
-  if (placement >= 7 && placement <= 12) return { tier: 4, name: 'Top 6', points: 2 };
+  if (placement >= 2 && placement <= 3) return { tier: 2, name: 'Runner-Ups', points: 4 };
+  if (placement >= 4 && placement <= 6) return { tier: 3, name: 'Top 6', points: 3 };
+  if (placement >= 7 && placement <= 12) return { tier: 4, name: 'Top 12', points: 2 };
   if (placement >= 13 && placement <= 24) return { tier: 5, name: 'Bottom 12', points: 1 };
   return null;
 }
@@ -51,9 +51,9 @@ export function getTierInfo(placement) {
 export function getTierRange(tier) {
   const ranges = {
     1: { min: 1, max: 1, count: 1, points: 10, name: 'Winner' },
-    2: { min: 2, max: 3, count: 2, points: 4, name: 'Final 2' },
-    3: { min: 4, max: 6, count: 3, points: 3, name: 'Final 3' },
-    4: { min: 7, max: 12, count: 6, points: 2, name: 'Top 6' },
+    2: { min: 2, max: 3, count: 2, points: 4, name: 'Runner-Ups' },
+    3: { min: 4, max: 6, count: 3, points: 3, name: 'Top 6' },
+    4: { min: 7, max: 12, count: 6, points: 2, name: 'Top 12' },
     5: { min: 13, max: 24, count: 12, points: 1, name: 'Bottom 12' },
   };
   return ranges[tier];

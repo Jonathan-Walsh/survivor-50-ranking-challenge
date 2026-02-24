@@ -25,7 +25,8 @@ export function getPointsForPlacement(placement) {
  */
 export function calculateScore(permutation, rankings) {
   let currentScore = 0;
-  let maxPossibleScore = 0;
+  let totalPossibleScore = 0;
+  let pointsLost = 0;
   const breakdown = {
     correct: [],
     incorrect: [],
@@ -43,7 +44,7 @@ export function calculateScore(permutation, rankings) {
 
     const tierInfo = getTierInfo(predictedPlacement);
     const maxPoints = tierInfo.points;
-    maxPossibleScore += maxPoints;
+    totalPossibleScore += maxPoints;
 
     if (contestant.placement === null) {
       // Not yet resolved
@@ -68,6 +69,7 @@ export function calculateScore(permutation, rankings) {
           points: maxPoints,
         });
       } else {
+        pointsLost += maxPoints;
         breakdown.incorrect.push({
           id: contestantId,
           name: contestant.name,
@@ -80,6 +82,7 @@ export function calculateScore(permutation, rankings) {
     }
   }
 
+  const maxPossibleScore = totalPossibleScore - pointsLost;
   const potentialRemaining = maxPossibleScore - currentScore;
 
   return {

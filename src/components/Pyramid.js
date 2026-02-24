@@ -14,6 +14,12 @@ import { ContestantCard } from './ContestantCard.js';
 import { getTierInfo, getTierRange } from '../game.js';
 
 const TIER_ORDER = [1, 2, 3, 4, 5];
+const TRIBE_ORDER = ['cila', 'kalo', 'vatu'];
+const TRIBE_LABELS = {
+  cila: 'Cila',
+  kalo: 'Kalo',
+  vatu: 'Vatu',
+};
 
 /**
  * Tier Component (one row of the pyramid)
@@ -49,6 +55,7 @@ function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly, st
               id: c.id,
               name: c.name,
               imageUrl: c.imageUrl,
+              tribe: c.tribe,
               draggable: !readOnly,
               status: statusById[c.id] || null,
               onDragStart: (e, id) => {
@@ -67,14 +74,29 @@ function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly, st
  * If an initial permutation exists, populate tiers from placement order.
  */
 function buildInitialTiers(contestants, initialPermutation = null) {
+  const tribeById = {};
+  for (const c of contestants) {
+    tribeById[c.id] = c.tribe;
+  }
+
+  const emptyPool = {
+    cila: [],
+    kalo: [],
+    vatu: [],
+  };
+
   if (!initialPermutation || initialPermutation.length === 0) {
+    for (const c of contestants) {
+      const tribe = tribeById[c.id] || 'cila';
+      emptyPool[tribe].push(c.id);
+    }
     return {
       1: [],
       2: [],
       3: [],
       4: [],
       5: [],
-      pool: contestants.map((c) => c.id),
+      pool: emptyPool,
     };
   }
 
@@ -109,7 +131,16 @@ function buildInitialTiers(contestants, initialPermutation = null) {
   cursor += tier4Count;
   const tier5 = orderedIds.slice(cursor, cursor + tier5Count);
   cursor += tier5Count;
-  const pool = orderedIds.slice(cursor);
+  const poolIds = orderedIds.slice(cursor);
+  const pool = {
+    cila: [],
+    kalo: [],
+    vatu: [],
+  };
+  for (const id of poolIds) {
+    const tribe = tribeById[id] || 'cila';
+    pool[tribe].push(id);
+  }
 
   return {
     1: tier1,
@@ -130,7 +161,9 @@ function tiersToPermutation(tierMap) {
   for (const t of TIER_ORDER) {
     for (const id of tierMap[t]) perm.push(id);
   }
-  for (const id of tierMap.pool) perm.push(id);
+  for (const tribe of TRIBE_ORDER) {
+    for (const id of tierMap.pool[tribe]) perm.push(id);
+  }
   return perm;
 }
 
@@ -222,15 +255,24 @@ export function Pyramid({
 
       // Clone
       const next = {};
-      for (const key of [...TIER_ORDER, 'pool']) {
+      for (const key of TIER_ORDER) {
         next[key] = prev[key].filter((id) => id !== contestantId);
+      }
+      next.pool = {};
+      for (const tribe of TRIBE_ORDER) {
+        next.pool[tribe] = prev.pool[tribe].filter((id) => id !== contestantId);
       }
 
       // Insert into target
-      next[targetTier].push(contestantId);
+      if (targetTier === 'pool') {
+        const tribe = (contestantById[contestantId] && contestantById[contestantId].tribe) || 'cila';
+        next.pool[tribe].push(contestantId);
+      } else {
+        next[targetTier].push(contestantId);
+      }
       return next;
     });
-  }, []);
+  }, [contestantById]);
 
   return h(
     'div',
@@ -260,29 +302,39 @@ export function Pyramid({
       { className: 'tier tier-pool' },
       h('div', { className: 'tier-label' },
         h('div', { className: 'tier-title' }, 'Contestants'),
-        h('div', { className: 'tier-count' }, `${tierMap.pool.length} remaining`)
+        h('div', { className: 'tier-count' },
+          `${TRIBE_ORDER.reduce((sum, tribe) => sum + tierMap.pool[tribe].length, 0)} remaining`
+        )
       ),
-      h(
-        'div',
-        {
-          className: 'tier-slots pool-slots',
-          onDrop: (e) => handleDrop(e, 'pool'),
-          onDragOver: handleDragOver,
-        },
-        tierMap.pool.map((id) => {
-          const c = contestantById[id];
-          if (!c) return null;
-          return h(ContestantCard, {
-            key: c.id,
-            id: c.id,
-            name: c.name,
-            imageUrl: c.imageUrl,
-            onDragStart: (e, cid) => {
-              e.dataTransfer.effectAllowed = 'move';
-              e.dataTransfer.setData('text/plain', String(cid));
-            },
-          });
-        })
+      h('div', { className: 'pool-tribes' },
+        TRIBE_ORDER.map((tribe) =>
+          h('div', { key: tribe, className: `pool-tribe pool-tribe-${tribe}` },
+            h('div', { className: 'pool-tribe-label' }, TRIBE_LABELS[tribe]),
+            h(
+              'div',
+              {
+                className: 'tier-slots pool-slots',
+                onDrop: (e) => handleDrop(e, 'pool'),
+                onDragOver: handleDragOver,
+              },
+              tierMap.pool[tribe].map((id) => {
+                const c = contestantById[id];
+                if (!c) return null;
+                return h(ContestantCard, {
+                  key: c.id,
+                  id: c.id,
+                  name: c.name,
+                  imageUrl: c.imageUrl,
+                  tribe: c.tribe,
+                  onDragStart: (e, cid) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', String(cid));
+                  },
+                });
+              })
+            )
+          )
+        )
       )
     )
   );

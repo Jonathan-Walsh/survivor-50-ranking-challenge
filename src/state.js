@@ -14,17 +14,12 @@ import { encodePermutation, decodePermutation } from './encoding.js';
 export function parseHash() {
   const hash = window.location.hash.slice(1); // Remove #
   const params = {};
-
   if (!hash) return params;
 
-  const pairs = hash.split('&');
-  for (const pair of pairs) {
-    const [key, value] = pair.split('=');
-    if (key && value) {
-      params[key] = decodeURIComponent(value);
-    }
+  const searchParams = new URLSearchParams(hash);
+  for (const [key, value] of searchParams.entries()) {
+    params[key] = value;
   }
-
   return params;
 }
 
@@ -123,11 +118,7 @@ export function savePlayerPrediction(permutation, playerName, friends = []) {
 export function addFriend(friendCode, friendName) {
   const params = parseHash();
   const friends = parseFriendCodes(params.f);
-
-  // Check if friend already exists
-  if (!friends.find((f) => f.code === friendCode)) {
-    friends.push({ code: friendCode, name: friendName });
-  }
+  friends.push({ code: friendCode, name: friendName });
 
   const friendString = friends.map((f) => `${f.code}:${f.name}`).join(',');
   params.f = friendString;
