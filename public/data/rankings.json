@@ -1,17 +1,17 @@
 {
   "season": 50,
   "version": 2,
-  "lastUpdated": "2026-02-24T06:07:18.936Z",
+  "lastUpdated": "2026-02-24T08:03:38.087Z",
   "contestants": [
     {
       "id": 1,
       "name": "Angelina Keeley",
-      "placement": 11
+      "placement": null
     },
     {
       "id": 2,
       "name": "Aubry Bracco",
-      "placement": 19
+      "placement": null
     },
     {
       "id": 3,
@@ -21,7 +21,7 @@
     {
       "id": 4,
       "name": "Charlie Davis",
-      "placement": 17
+      "placement": null
     },
     {
       "id": 5,
@@ -41,22 +41,22 @@
     {
       "id": 8,
       "name": "Colby Donaldson",
-      "placement": 16
+      "placement": null
     },
     {
       "id": 9,
       "name": "Dee Valladres",
-      "placement": 15
+      "placement": null
     },
     {
       "id": 10,
       "name": "Emily Flippen",
-      "placement": 24
+      "placement": null
     },
     {
       "id": 11,
       "name": "Genevieve Mushaluk",
-      "placement": 14
+      "placement": null
     },
     {
       "id": 12,
@@ -71,7 +71,7 @@
     {
       "id": 14,
       "name": "Jonathan Young",
-      "placement": 23
+      "placement": null
     },
     {
       "id": 15,
@@ -86,7 +86,7 @@
     {
       "id": 17,
       "name": "Mike White",
-      "placement": 22
+      "placement": null
     },
     {
       "id": 18,
@@ -101,12 +101,12 @@
     {
       "id": 20,
       "name": "Rick Devens",
-      "placement": 21
+      "placement": null
     },
     {
       "id": 21,
       "name": "Rizo Velovic",
-      "placement": 13
+      "placement": null
     },
     {
       "id": 22,
@@ -116,12 +116,12 @@
     {
       "id": 23,
       "name": "Stephenie LaGrossa",
-      "placement": 20
+      "placement": null
     },
     {
       "id": 24,
       "name": "Tiffany Ervin",
-      "placement": 18
+      "placement": null
     }
   ]
 }
