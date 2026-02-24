@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encoding Tests - Survivor 50</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #e8a028;
+    }
+    .test {
+      margin: 15px 0;
+      padding: 10px;
+      border-left: 4px solid #00b894;
+      background: #f9f9f9;
+    }
+    .test.pass {
+      border-left-color: #00b894;
+    }
+    .test.fail {
+      border-left-color: #d63031;
+    }
+    .status {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .pass { color: #27ae60; }
+    .fail { color: #d63031; }
+    pre {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    #results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-radius: 4px;
+    }
+    #results.all-pass {
+      background: #e8f5e9;
+      color: #27ae60;
+    }
+    #results.has-fail {
+      background: #ffebee;
+      color: #d63031;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Encoding Tests - Survivor 50</h1>
+    <p>Testing factorial number system + base62 encoding/decoding</p>
+    <div id="tests"></div>
+    <div id="results"></div>
+  </div>
+
+  <script type="module">
+    import {
+      permutationToFactorial,
+      factorialToPermutation,
+      base62Encode,
+      base62Decode,
+      encodePermutation,
+      decodePermutation,
+      testRoundTrip,
+    } from './src/encoding.js';
+
+    const testResults = [];
+
+    function addTest(name, fn) {
+      try {
+        fn();
+        testResults.push({ name, passed: true });
+        return true;
+      } catch (error) {
+        testResults.push({ name, passed: false, error: error.message });
+        return false;
+      }
+    }
+
+    // Test Suite
+    console.log('🧪 Running Encoding Tests...\n');
+
+    // Test 1: Identity permutation
+    addTest('Identity permutation [1, 2, 3, ..., 24]', () => {
+      const identity = Array.from({ length: 24 }, (_, i) => i + 1);
+      const code = testRoundTrip(identity);
+      if (code.length !== 14) throw new Error(`Expected 14 chars, got ${code.length}`);
+      console.log(`✓ Test 1: Code = "${code}"`);
+    });
+
+    // Test 2: Reverse permutation
+    addTest('Reverse permutation [24, 23, ..., 1]', () => {
+      const reverse = Array.from({ length: 24 }, (_, i) => 24 - i);
+      const code = testRoundTrip(reverse);
+      if (code.length !== 14) throw new Error(`Expected 14 chars, got ${code.length}`);
+      console.log(`✓ Test 2: Code = "${code}"`);
+    });
+
+    // Test 3: Random permutation
+    addTest('Random permutation round-trip', () => {
+      const random = Array.from({ length: 24 }, (_, i) => i + 1);
+      for (let i = random.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [random[i], random[j]] = [random[j], random[i]];
+      }
+      const code = testRoundTrip(random);
+      if (code.length !== 14) throw new Error(`Expected 14 chars, got ${code.length}`);
+      console.log(`✓ Test 3: Code = "${code}"`);
+    });
+
+    // Test 4: Code length
+    addTest('All codes are exactly 14 characters', () => {
+      const identity = Array.from({ length: 24 }, (_, i) => i + 1);
+      const code1 = encodePermutation(identity);
+      const code2 = encodePermutation([...identity].reverse());
+      if (code1.length !== 14 || code2.length !== 14) {
+        throw new Error('Code length not 14');
+      }
+    });
+
+    // Test 5: Base62 characters only
+    addTest('All codes use only base62 characters', () => {
+      const identity = Array.from({ length: 24 }, (_, i) => i + 1);
+      const code = encodePermutation(identity);
+      if (!/^[0-9a-zA-Z]{14}$/.test(code)) {
+        throw new Error(`Invalid characters in code: ${code}`);
+      }
+    });
+
+    // Test 6: Deterministic encoding
+    addTest('Encoding is deterministic', () => {
+      const perm = [5, 12, 3, 7, 1, 14, 2, 9, 11, 4, 6, 8, 10, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+      const code1 = encodePermutation(perm);
+      const code2 = encodePermutation(perm);
+      if (code1 !== code2) {
+        throw new Error(`Codes differ: "${code1}" vs "${code2}"`);
+      }
+    });
+
+    // Test 7: Decode all zeros
+    addTest('Can decode all-zero code', () => {
+      const decoded = decodePermutation('00000000000000');
+      if (!Array.isArray(decoded) || decoded.length !== 24) {
+        throw new Error('Invalid decoded permutation');
+      }
+    });
+
+    // Test 8: Invalid code rejection - wrong length
+    addTest('Rejects codes with wrong length', () => {
+      try {
+        decodePermutation('short');
+        throw new Error('Should have thrown');
+      } catch (error) {
+        if (error.message === 'Should have thrown') throw error;
+        // Expected
+      }
+    });
+
+    // Test 9: Specific scenario - contestant 5 wins
+    addTest('Contestant 5 as winner scenario', () => {
+      const perm = Array.from({ length: 24 }, (_, i) => i + 1);
+      perm[0] = 5; // Position 1 (winner)
+      const code = encodePermutation(perm);
+      const decoded = decodePermutation(code);
+      if (decoded[0] !== 5) throw new Error('Winner not decoded correctly');
+    });
+
+    // Test 10: Multiple participants scenario
+    addTest('Multiple participant codes are unique', () => {
+      const perm1 = Array.from({ length: 24 }, (_, i) => i + 1);
+      const perm2 = [...perm1];
+      [perm2[0], perm2[1]] = [perm2[1], perm2[0]]; // Swap first two
+      const code1 = encodePermutation(perm1);
+      const code2 = encodePermutation(perm2);
+      if (code1 === code2) {
+        throw new Error('Different permutations produced same code');
+      }
+    });
+
+    // Render results
+    const testsDiv = document.getElementById('tests');
+    const resultsDiv = document.getElementById('results');
+
+    testResults.forEach((result, i) => {
+      const testDiv = document.createElement('div');
+      testDiv.className = `test ${result.passed ? 'pass' : 'fail'}`;
+      testDiv.innerHTML = `
+        <div class="status ${result.passed ? 'pass' : 'fail'}">
+          ${result.passed ? '✓' : '✗'} Test ${i + 1}: ${result.name}
+        </div>
+        ${result.error ? `<pre>Error: ${result.error}</pre>` : ''}
+      `;
+      testsDiv.appendChild(testDiv);
+    });
+
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = testResults.length;
+    const allPass = passed === total;
+
+    resultsDiv.className = allPass ? 'all-pass' : 'has-fail';
+    resultsDiv.innerHTML = `
+      <strong>${allPass ? '✅ All tests passed!' : '❌ Some tests failed!'}</strong>
+      <br>
+      ${passed}/${total} tests passed
+    `;
+
+    console.log(`\n${allPass ? '✅' : '❌'} ${passed}/${total} tests passed`);
+  </script>
+</body>
+</html>

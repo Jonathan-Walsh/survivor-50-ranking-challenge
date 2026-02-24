@@ -1,0 +1,15 @@
+Goal: Make a website that allows me to play a game with my friends and family where we individually rank the cast of Survivor season 50 and get points if we correctly guess how they place.
+
+Introduction: Similar to Fantasy Football, there is a "Fantasy Survivor" where you pick players on the latest season of the TV show Survivor and you get points based on how long they last, if they win challenges, how many times they give confessionals, etc. I would love to create a simpler game to play with my family and friends modeled more off of March Madness, where each person can decide how they think they players will place and you get points if your placement is correct.
+
+Game Details: There are 24 contestants on Survivor 50. I want the website to have a bottom row that shows all of the Survivor contestants. Above that, I want a row of 12, then a row of six, then a row of three, then a row of two, then a row of one. The players of this game will drag the pictures of each player to where they think they will place. The 12-slot row will be for places 13-24. The six-slot row will be for places 7-12. And so forth. When they are done, the player will "lock" in their choices and get a code that allows them to bookmark and save their choices and revisit this site throughout the season to see how many points they get. For the 12-slot row, they will get 1 point for each correct answer (they only have to guess that they're in the bottom 12). For the six-slot row, they get two points if they correctly guess the player is in places 7-12, and so on. I would also like a pane for users to be able to add in the "code" of their family members and friends and see a leaderboard throughout the season. They should be able to bookmark the URL and return to the page to see their saved choices, their friends and family's saved choices, and the leaderboard
+
+Technical Details: I don't have much experience with building a website but I am an experienced software engineer. I want this to a be a "static" site in that there is no backend components or storage: the URL should contain all of the info needed so that the user can bookmark the website and return to their saved choices. The only updates I will make throughout the season will be to update a file with the ranking of the contestants as they are voted out. I am storing the code on GitHub, and need your help figuring out deployment and hosting strategies. I want the website to be lightly-Survivor themed. Nothing official, just colors, font, etc. For the contenstants, we can use placeholder images or just text (you can come up with names for me to fill in later).
+
+Planning asks:
+- Think about the details of the game and if there are any improvements we should make
+- Think about how players should "save" their results and load them/load their family/friends, and if my URL idea makes sense and how that would work
+- Think about deployment/hosting strategies that are cheap and easy. I expect their to be few users of this.
+- Think about languages/frameworks we should use
+
+End goal: create a spec document for us to work off.

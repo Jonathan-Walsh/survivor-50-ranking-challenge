@@ -1,0 +1,31 @@
+{
+  "season": 50,
+  "version": 1,
+  "lastUpdated": "2026-02-23T00:00:00Z",
+  "contestants": [
+    { "id": 1, "name": "Contestant A", "placement": null },
+    { "id": 2, "name": "Contestant B", "placement": null },
+    { "id": 3, "name": "Contestant C", "placement": null },
+    { "id": 4, "name": "Contestant D", "placement": null },
+    { "id": 5, "name": "Contestant E", "placement": null },
+    { "id": 6, "name": "Contestant F", "placement": null },
+    { "id": 7, "name": "Contestant G", "placement": null },
+    { "id": 8, "name": "Contestant H", "placement": null },
+    { "id": 9, "name": "Contestant I", "placement": null },
+    { "id": 10, "name": "Contestant J", "placement": null },
+    { "id": 11, "name": "Contestant K", "placement": null },
+    { "id": 12, "name": "Contestant L", "placement": null },
+    { "id": 13, "name": "Contestant M", "placement": null },
+    { "id": 14, "name": "Contestant N", "placement": null },
+    { "id": 15, "name": "Contestant O", "placement": null },
+    { "id": 16, "name": "Contestant P", "placement": null },
+    { "id": 17, "name": "Contestant Q", "placement": null },
+    { "id": 18, "name": "Contestant R", "placement": null },
+    { "id": 19, "name": "Contestant S", "placement": null },
+    { "id": 20, "name": "Contestant T", "placement": null },
+    { "id": 21, "name": "Contestant U", "placement": null },
+    { "id": 22, "name": "Contestant V", "placement": null },
+    { "id": 23, "name": "Contestant W", "placement": null },
+    { "id": 24, "name": "Contestant X", "placement": null }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "survivor-50-fantasy",
+  "version": "0.1.0",
+  "description": "A simple fantasy league game for Survivor Season 50",
+  "type": "module",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "test": "node test-encoding.js"
+  },
+  "keywords": [
+    "survivor",
+    "fantasy",
+    "game",
+    "prediction"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}
