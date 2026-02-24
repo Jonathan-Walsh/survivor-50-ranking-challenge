@@ -94,11 +94,11 @@ body {
 }
 
 .footer {
-  background: linear-gradient(to right, var(--ocean-blue), var(--jungle-green));
+  background: #5a5a5a;
   color: var(--text-light);
   padding: var(--spacing-lg);
   text-align: center;
-  border-top: 4px solid var(--torch-orange);
+  border-top: 3px solid #d4a574;
   margin-top: auto;
 }
 
@@ -180,7 +180,7 @@ body {
 }
 
 .tier.tier-pool {
-  background: linear-gradient(135deg, rgba(27, 135, 135, 0.05), rgba(255, 149, 0, 0.05));
+  background: #fafafa;
   min-height: 200px;
   border: 2px dashed var(--island-sand);
 }
@@ -228,11 +228,7 @@ body {
   align-content: start;
   min-height: 100px;
   padding: var(--spacing-sm);
-  background: linear-gradient(
-    135deg,
-    rgba(232, 160, 40, 0.05),
-    rgba(0, 184, 148, 0.05)
-  );
+  background: #fafafa;
   border-radius: 4px;
   border: 2px dashed var(--border-gray);
 }
@@ -407,121 +403,46 @@ body {
 
 /* Score Display */
 .score-panel {
-  flex: 1;
-  min-width: 250px;
+  display: flex;
+  align-items: center;
 }
 
 .score-display {
-  background: linear-gradient(135deg, rgba(0, 184, 148, 0.1), rgba(232, 160, 40, 0.1));
-  border: 2px solid var(--tribe-teal);
-  border-radius: 8px;
-  padding: var(--spacing-md);
-}
-
-.score-loading {
-  padding: var(--spacing-md);
-  text-align: center;
-  color: #999;
-}
-
-.score-main {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-.score-current,
-.score-max {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: baseline;
+  gap: 4px;
 }
 
 .score-number {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  color: var(--torch-orange);
+  color: #333;
 }
 
 .score-label {
-  font-size: 0.75rem;
-  color: #999;
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Drop Hint */
+.drop-hint {
+  padding: var(--spacing-lg);
   text-align: center;
-}
-
-.score-divider {
-  font-size: 1.5rem;
-  color: #ccc;
-}
-
-.score-progress {
-  margin-bottom: var(--spacing-md);
-}
-
-.progress-bar {
+  color: #aaa;
+  font-size: 0.9rem;
   width: 100%;
-  height: 8px;
-  background: #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: var(--spacing-xs);
 }
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--tribe-teal), var(--torch-orange));
-  transition: width 0.3s ease;
+.tier-slots-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.progress-text {
-  font-size: 0.75rem;
+.tier-spots {
+  font-size: 0.8rem;
   color: #999;
-  text-align: center;
-}
-
-.score-tier {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  background: white;
-  border-radius: 4px;
-  margin-bottom: var(--spacing-sm);
-}
-
-.tier-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--torch-orange);
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
-.tier-message {
-  font-size: 0.9rem;
-  color: var(--text-dark);
-  font-weight: 600;
-}
-
-.score-potential {
-  background: rgba(26, 71, 42, 0.05);
-  border-left: 3px solid var(--ocean-blue);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 4px;
-}
-
-.score-potential p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--ocean-blue);
+  margin-top: var(--spacing-xs);
 }
 
 /* Leaderboard */
@@ -558,33 +479,27 @@ body {
 
 .leaderboard-header {
   display: grid;
-  grid-template-columns: 60px 1fr 80px 200px 60px;
+  grid-template-columns: 60px 1fr 100px;
   gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--ocean-blue), var(--tribe-teal));
-  color: white;
+  background: #d4a574;
+  color: #1a1a1a;
   font-weight: bold;
   border-bottom: 2px solid var(--border-gray);
 }
 
 .leaderboard-row {
   display: grid;
-  grid-template-columns: 60px 1fr 80px 200px 60px;
+  grid-template-columns: 60px 1fr 100px;
   gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-lg);
   align-items: center;
   border-bottom: 1px solid var(--border-gray);
-  transition: background 0.2s;
-}
-
-.leaderboard-row:hover {
-  background: rgba(232, 160, 40, 0.05);
 }
 
 .col-rank {
   text-align: center;
   font-weight: bold;
-  font-size: 1.1rem;
 }
 
 .col-name {
@@ -597,75 +512,12 @@ body {
 }
 
 .col-score {
-  text-align: center;
+  text-align: right;
   font-weight: bold;
 }
 
 .score-value {
-  color: var(--torch-orange);
-  font-size: 1.2rem;
-}
-
-.score-max {
-  color: #999;
-  font-size: 0.9rem;
-}
-
-.col-progress {
-  display: flex;
-  align-items: center;
-}
-
-.progress-bar-small {
-  width: 100%;
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill-small {
-  height: 100%;
-  background: linear-gradient(90deg, var(--tribe-teal), var(--torch-orange));
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.col-tier {
-  text-align: center;
-}
-
-.tier-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 0.85rem;
-  color: white;
-}
-
-.tier-badge.tier-S {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #333;
-}
-
-.tier-badge.tier-A {
-  background: linear-gradient(135deg, #ff6b6b, #ff8787);
-}
-
-.tier-badge.tier-B {
-  background: linear-gradient(135deg, #4ecdc4, #44a08d);
-}
-
-.tier-badge.tier-C {
-  background: linear-gradient(135deg, #95e1d3, #a8d8ea);
-}
-
-.tier-badge.tier-D {
-  background: #bbb;
+  font-size: 1.1rem;
 }
 
 /* Friend Manager */

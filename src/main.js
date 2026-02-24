@@ -89,15 +89,14 @@ function App() {
   };
 
   if (loading) {
-    return h('div', { className: 'loading' }, '🏝️ Loading Survivor 50...');
+    return h('div', { className: 'loading' }, 'Loading...');
   }
 
   return h(
     'div',
     { className: 'app' },
     h('header', { className: 'header' },
-      h('h1', null, '🏝️ Survivor 50 Fantasy League'),
-      h('p', null, 'Rank contestants by predicted elimination order and earn points')
+      h('h1', null, 'Survivor 50 Fantasy League')
     ),
     h('main', { className: 'main' },
       h('div', { className: 'player-section' },
@@ -125,7 +124,6 @@ function App() {
         )
       ),
       gameState && h(Pyramid, {
-        permutation: gameState.permutation,
         contestants: CONTESTANTS,
         onPermutationChange: handlePermutationChange,
       }),
@@ -161,5 +159,4 @@ function App() {
 const appElement = document.getElementById('app');
 render(h(App), appElement);
 
-console.log('✅ Survivor 50 Fantasy League - Phase 2: Pyramid UI Complete');
-console.log('Drag-and-drop interface ready for predictions');
+console.log('Survivor 50 Fantasy League loaded');

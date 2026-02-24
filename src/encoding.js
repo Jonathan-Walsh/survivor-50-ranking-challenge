@@ -93,7 +93,7 @@ export function factorialToPermutation(factorial) {
  * @returns {string} - Base62 encoded string
  */
 export function base62Encode(num) {
-  if (num === 0n) return '0';
+  if (num === 0n) return '00000000000000';
 
   let result = '';
   while (num > 0n) {
@@ -101,7 +101,6 @@ export function base62Encode(num) {
     num = num / 62n;
   }
 
-  // Pad to 14 characters (required for 24! permutations)
   return result.padStart(14, '0');
 }
 
