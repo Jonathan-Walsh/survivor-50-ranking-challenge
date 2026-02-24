@@ -6,10 +6,18 @@
 
 import { getTierInfo } from './game.js';
 
-export const SCORING_MODES = {
-  CLASSIC: 'classic',
-  PROGRESSIVE: 'progressive',
-};
+/**
+ * Determine if the game has reached Top 12 (12 or fewer contestants remain unresolved).
+ * @param {Array} rankings - Actual placement data from rankings.json
+ * @returns {boolean}
+ */
+export function hasReachedTop12Cutoff(rankings) {
+  if (!Array.isArray(rankings) || rankings.length === 0) return false;
+  const unresolvedCount = rankings.filter(
+    (c) => c.placement === null || c.placement === undefined
+  ).length;
+  return unresolvedCount <= 12;
+}
 
 /**
  * Get points for a contestant based on their placement
@@ -24,29 +32,25 @@ export function getPointsForPlacement(placement) {
 
 /**
  * Get points for a predicted placement vs actual placement.
- * Classic: exact-tier only.
- * Progressive: partial credit up to predicted tier cap.
+ * Uses tier-capped partial credit, except Bottom 12 picks which require
+ * actual Bottom 12 placement to score.
  * @param {number} predictedPlacement
  * @param {number|null} actualPlacement
- * @param {string} mode
  * @returns {number}
  */
-export function getPointsForMatch(predictedPlacement, actualPlacement, mode = SCORING_MODES.CLASSIC) {
+export function getPointsForMatch(predictedPlacement, actualPlacement) {
   if (actualPlacement === null || actualPlacement === undefined) return 0;
 
   const predictedTier = getTierInfo(predictedPlacement);
   const actualTier = getTierInfo(actualPlacement);
   if (!predictedTier || !actualTier) return 0;
 
-  if (mode === SCORING_MODES.PROGRESSIVE) {
-    // Winner slot uses linear points by exact finish (1st=10 ... 10th+=1)
-    if (predictedTier.tier === 1) {
-      return Math.max(1, 11 - actualPlacement);
-    }
-    return Math.min(predictedTier.points, actualTier.points);
+  // Bottom 12 picks are exact-bucket only (no "place anywhere" auto-point).
+  if (predictedTier.tier === 5) {
+    return actualTier.tier === 5 ? predictedTier.points : 0;
   }
 
-  return predictedTier.tier === actualTier.tier ? predictedTier.points : 0;
+  return Math.min(predictedTier.points, actualTier.points);
 }
 
 /**
@@ -55,9 +59,10 @@ export function getPointsForMatch(predictedPlacement, actualPlacement, mode = SC
  * @param {Array} rankings - Actual placement data from rankings.json
  * @returns {Object} - { currentScore, maxPossibleScore, breakdown }
  */
-export function calculateScore(permutation, rankings, mode = SCORING_MODES.CLASSIC) {
+export function calculateScore(permutation, rankings) {
   let currentScore = 0;
   let maxPossibleScore = 0;
+  const reachedTop12Cutoff = hasReachedTop12Cutoff(rankings);
   const breakdown = {
     exact: [],
     partial: [],
@@ -78,7 +83,22 @@ export function calculateScore(permutation, rankings, mode = SCORING_MODES.CLASS
     const maxPoints = tierInfo ? tierInfo.points : 0;
     maxPossibleScore += maxPoints;
 
-    if (contestant.placement === null) {
+    if (contestant.placement === null || contestant.placement === undefined) {
+      // Bottom 12 picks become guaranteed misses once Top 12 cutoff is reached.
+      if (tierInfo.tier === 5 && reachedTop12Cutoff) {
+        maxPossibleScore -= maxPoints;
+        breakdown.miss.push({
+          id: contestantId,
+          name: contestant.name,
+          predictedTier: tierInfo.name,
+          actualTier: 'Top 12 (remaining)',
+          actualPlacement: null,
+          points: 0,
+          maxPoints,
+        });
+        continue;
+      }
+
       // Not yet resolved
       breakdown.unresolved.push({
         id: contestantId,
@@ -87,7 +107,7 @@ export function calculateScore(permutation, rankings, mode = SCORING_MODES.CLASS
         potentialPoints: maxPoints,
       });
     } else {
-      const earnedPoints = getPointsForMatch(predictedPlacement, contestant.placement, mode);
+      const earnedPoints = getPointsForMatch(predictedPlacement, contestant.placement);
       const actualTier = getTierInfo(contestant.placement);
       currentScore += earnedPoints;
 
@@ -133,9 +153,9 @@ export function calculateScore(permutation, rankings, mode = SCORING_MODES.CLASS
  * @param {Array} rankings - Actual placement data
  * @returns {Array} - Sorted by score descending
  */
-export function compareScores(players, rankings, mode = SCORING_MODES.CLASSIC) {
+export function compareScores(players, rankings) {
   const scores = players.map((player) => {
-    const scoreData = calculateScore(player.permutation, rankings, mode);
+    const scoreData = calculateScore(player.permutation, rankings);
     return {
       name: player.name,
       code: player.code,

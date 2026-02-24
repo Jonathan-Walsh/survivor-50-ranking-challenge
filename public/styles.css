@@ -38,7 +38,15 @@ body {
 .header {
   background: var(--sand);
   padding: 16px 24px;
-  text-align: center;
+}
+
+.header-row {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .header h1 {
@@ -46,6 +54,7 @@ body {
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 1px;
+  margin: 0;
 }
 
 .main {
@@ -126,25 +135,6 @@ body {
 .player-name-input:focus {
   outline: none;
   border-color: var(--sand);
-}
-
-.scoring-mode-select {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 0.95rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--white);
-}
-
-.scoring-mode-select:focus {
-  outline: none;
-  border-color: var(--sand);
-}
-
-.text-muted-small {
-  font-size: 0.85rem;
-  color: var(--text-muted);
 }
 
 /* Score display */
@@ -449,14 +439,22 @@ body {
   line-height: 1.2;
 }
 
+.contestant-placement-badge,
 .contestant-score-badge {
-  margin-left: auto;
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--text-muted);
   background: rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   padding: 1px 6px;
+}
+
+.contestant-placement-badge {
+  margin-left: auto;
+}
+
+.contestant-score-badge {
+  margin-left: 4px;
 }
 
 /* Friends */
@@ -663,19 +661,16 @@ body {
 
 /* Instructions */
 .btn-instructions {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
   padding: 8px 16px;
-  background: var(--sand);
+  background: var(--sand-light);
   color: var(--text);
-  border: none;
+  border: 1px solid var(--sand-dark);
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.85rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 100;
+  box-shadow: none;
+  white-space: nowrap;
 }
 
 .btn-instructions:hover { opacity: 0.85; }
@@ -698,6 +693,7 @@ body {
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  text-align: left;
 }
 
 .modal-header {
@@ -730,11 +726,29 @@ body {
 .modal-body h3 { margin: 16px 0 8px; font-size: 1rem; }
 .modal-body h3:first-child { margin-top: 0; }
 .modal-body p { margin: 8px 0; font-size: 0.9rem; color: #333; }
-.modal-body ul, .modal-body ol { margin: 8px 0; padding-left: 24px; font-size: 0.9rem; }
-.modal-body li { margin: 4px 0; }
+.modal-body ul, .modal-body ol {
+  margin: 8px 0;
+  padding-left: 20px;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.modal-body li {
+  margin: 4px 0;
+  padding-left: 2px;
+}
 
 /* Responsive */
 @media (max-width: 900px) {
+  .header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .header h1 {
+    text-align: center;
+  }
+  .btn-instructions {
+    align-self: center;
+  }
   .layout {
     flex-direction: column;
   }

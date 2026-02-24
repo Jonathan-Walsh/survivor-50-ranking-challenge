@@ -19,7 +19,7 @@ import { Pyramid } from './components/Pyramid.js';
 import { Leaderboard } from './components/Leaderboard.js';
 import { FriendManager } from './components/FriendManager.js';
 import { Instructions } from './components/Instructions.js';
-import { fetchRankings, SCORING_MODES } from './scoring.js';
+import { fetchRankings } from './scoring.js';
 
 const CONTESTANTS = [
   { id: 1, name: 'Angelina', tribe: 'cila' },
@@ -57,7 +57,6 @@ function App() {
   const [resetVersion, setResetVersion] = useState(0);
   // viewingPlayer: null = viewing own picks, otherwise { name, permutation, code }
   const [viewingPlayer, setViewingPlayer] = useState(null);
-  const [scoringMode, setScoringMode] = useState(SCORING_MODES.PROGRESSIVE);
 
   // Store the current permutation in a ref so the Pyramid callback is stable
   const permRef = useRef(createInitialPermutation());
@@ -68,10 +67,6 @@ function App() {
     if (params.n) {
       setPlayerName(params.n);
     }
-    if (params.m === SCORING_MODES.CLASSIC || params.m === SCORING_MODES.PROGRESSIVE) {
-      setScoringMode(params.m);
-    }
-
     const parsedFriends = parseFriendCodes(params.f);
     const decodedFriends = parsedFriends.map((f) => ({
       ...f,
@@ -118,7 +113,7 @@ function App() {
   const handleLockIn = () => {
     const perm = permRef.current;
     console.log('Locking in. First 5 of permutation:', perm.slice(0, 5));
-    const code = savePlayerPrediction(perm, playerName, friends, scoringMode);
+    const code = savePlayerPrediction(perm, playerName, friends);
     console.log('Generated code:', code);
     setPlayerCode(code);
   };
@@ -133,7 +128,6 @@ function App() {
     serializeHash({
       n: params.n || playerName,
       f: params.f || '',
-      m: params.m || scoringMode,
     });
   };
 
@@ -177,8 +171,10 @@ function App() {
     'div',
     { className: 'app' },
     h('header', { className: 'header' },
-      h('h1', null, 'Survivor 50 Fantasy League'),
-      h(Instructions, { scoringMode })
+      h('div', { className: 'header-row' },
+        h('h1', null, 'Survivor 50 Fantasy League'),
+        h(Instructions)
+      )
     ),
     h('main', { className: 'main' },
       h('div', { className: 'layout' },
@@ -192,7 +188,6 @@ function App() {
             readOnly: isViewingFriend,
             title: pyramidTitle,
             rankings,
-            scoringMode,
           }),
           isViewingFriend && h('div', { style: 'margin-top: 8px;' },
             h('button', {
@@ -227,37 +222,10 @@ function App() {
               )
             )
           ),
-          h('div', { className: 'sidebar-section' },
-            h('label', null, 'Scoring Mode'),
-            h('select', {
-              className: 'scoring-mode-select',
-              value: scoringMode,
-              onChange: (e) => {
-                const nextMode = e.target.value;
-                setScoringMode(nextMode);
-                const params = parseHash();
-                serializeHash({
-                  p: params.p || '',
-                  n: params.n || playerName,
-                  f: params.f || '',
-                  m: nextMode,
-                });
-              },
-            },
-            h('option', { value: SCORING_MODES.PROGRESSIVE }, 'Progressive (partial credit)'),
-            h('option', { value: SCORING_MODES.CLASSIC }, 'Classic (exact tier)')
-            ),
-            h('p', { className: 'text-muted-small' },
-              scoringMode === SCORING_MODES.PROGRESSIVE
-                ? 'Earn partial points up to your selected tier.'
-                : 'Score only when predicted and actual tiers match.'
-            )
-          ),
           // Leaderboard
           h('div', { className: 'sidebar-section' },
             h(Leaderboard, {
               players: allPlayers,
-              scoringMode,
               selectedPlayerKey: isViewingFriend ? viewingPlayer.viewKey : 'self',
               onSelectPlayer: (player) => player.isSelf ? handleViewPlayer(null) : handleViewPlayer(player),
             })

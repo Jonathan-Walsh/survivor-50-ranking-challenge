@@ -12,7 +12,7 @@ const { useState, useEffect, useCallback } = window.preactHooks;
 
 import { ContestantCard } from './ContestantCard.js';
 import { getTierRange } from '../game.js';
-import { getPointsForMatch, SCORING_MODES } from '../scoring.js';
+import { getPointsForMatch, hasReachedTop12Cutoff } from '../scoring.js';
 
 const TIER_ORDER = [1, 2, 3, 4, 5];
 const TRIBE_ORDER = ['cila', 'kalo', 'vatu'];
@@ -59,6 +59,9 @@ function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly, st
               tribe: c.tribe,
               draggable: !readOnly,
               status: statusById[c.id] ? statusById[c.id].state : null,
+              placementLabel: statusById[c.id] && statusById[c.id].placement !== null && statusById[c.id].placement !== undefined
+                ? `P${statusById[c.id].placement}`
+                : null,
               scoreBadge: statusById[c.id] ? `${statusById[c.id].points}/${statusById[c.id].maxPoints}` : null,
               onDragStart: (e, id) => {
                 e.dataTransfer.effectAllowed = 'move';
@@ -169,8 +172,9 @@ function tiersToPermutation(tierMap) {
   return perm;
 }
 
-function buildStatusById(tierMap, rankings, scoringMode = SCORING_MODES.CLASSIC) {
+function buildStatusById(tierMap, rankings) {
   if (!Array.isArray(rankings) || rankings.length === 0) return {};
+  const reachedTop12Cutoff = hasReachedTop12Cutoff(rankings);
 
   const placementById = new Map();
   for (const c of rankings) {
@@ -186,14 +190,17 @@ function buildStatusById(tierMap, rankings, scoringMode = SCORING_MODES.CLASSIC)
     for (const id of tierMap[tierNum]) {
       const placement = placementById.get(id);
       if (placement !== null && placement !== undefined) {
-        const earnedPoints = getPointsForMatch(predictedPlacement, placement, scoringMode);
+        const earnedPoints = getPointsForMatch(predictedPlacement, placement);
         let state = 'miss';
         if (earnedPoints === maxPoints) {
           state = 'exact';
         } else if (earnedPoints > 0) {
           state = 'partial';
         }
-        statusById[id] = { state, points: earnedPoints, maxPoints };
+        statusById[id] = { state, points: earnedPoints, maxPoints, placement };
+      } else if (tierNum === 5 && reachedTop12Cutoff) {
+        // Once Top 12 is reached, unresolved Bottom 12 picks are locked as 0/1.
+        statusById[id] = { state: 'miss', points: 0, maxPoints, placement: null };
       }
     }
   }
@@ -211,14 +218,13 @@ export function Pyramid({
   readOnly = false,
   title = 'Your Predictions',
   rankings = [],
-  scoringMode = SCORING_MODES.CLASSIC,
 }) {
   const [tierMap, setTierMap] = useState(() => buildInitialTiers(contestants, initialPermutation));
 
   // Lookup table: id → contestant object
   const contestantById = {};
   for (const c of contestants) contestantById[c.id] = c;
-  const statusById = buildStatusById(tierMap, rankings, scoringMode);
+  const statusById = buildStatusById(tierMap, rankings);
 
   // Whenever tierMap changes, push a fresh permutation up to parent
   useEffect(() => {

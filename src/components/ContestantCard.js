@@ -13,6 +13,7 @@ export function ContestantCard({
   isDragging,
   draggable = true,
   status = null,
+  placementLabel = null,
   scoreBadge = null,
   tribe = null,
 }) {
@@ -32,6 +33,7 @@ export function ContestantCard({
         : h('div', { className: 'placeholder' }, id)
     ),
     h('span', { className: 'contestant-name' }, name),
+    placementLabel && h('span', { className: 'contestant-placement-badge' }, placementLabel),
     scoreBadge && h('span', { className: 'contestant-score-badge' }, scoreBadge)
   );
 }

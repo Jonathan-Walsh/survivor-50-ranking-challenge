@@ -1,49 +1,23 @@
 # Survivor 50 Fantasy League
 
-A simple prediction game where players rank Survivor contestants and earn points based on accurate placement predictions. All game state persists in the URL, enabling bookmarking and sharing without a backend.
+A simple prediction game where players rank Survivor contestants and earn progressive, tier-capped points as placements are revealed. All game state persists in the URL, enabling bookmarking and sharing without a backend.
 
 ## Project Status
 
-**Phase 1 Complete** ✅: Core Setup & Encoding
-- [x] File structure created
-- [x] Factorial number system + base62 encoding implemented
-- [x] URL state management implemented
-- [x] Test suite created
-- [x] Basic Preact app scaffold ready
+Current state:
+- [x] Pyramid prediction UI with drag/drop placement
+- [x] URL-based persistence for player picks and friend comparisons
+- [x] Progressive tier-capped scoring (`min(predictedTierValue, actualTierValue)`)
+- [x] Leaderboard and score breakdown views
+- [x] Instructions modal and responsive styling updates
+- [x] Rankings-backed score recalculation as results are resolved
 
-## Development Phases
+## Roadmap
 
-1. **Phase 1: Core Setup & Encoding** ✅
-   - Initial file structure
-   - Encoding/decoding logic (factorial + base62)
-   - URL state management
-   - Test suite
-
-2. **Phase 2: UI - Pyramid & Drag-Drop** (In Progress)
-   - Pyramid HTML/CSS structure (6 tiers)
-   - Drag-and-drop interface
-   - Contestant card components
-   - Placement validation
-
-3. **Phase 3: Data & Scoring** (Next)
-   - Rankings data file (rankings.json)
-   - Point calculation logic
-   - Score display
-
-4. **Phase 4: Social Features**
-   - Leaderboard comparison
-   - Friend code management
-   - Multi-player scoring
-
-5. **Phase 5: Styling & Polish**
-   - Survivor theme application
-   - Responsive design
-   - Error handling
-
-6. **Phase 6: Deployment**
-   - GitHub Pages setup
-   - CI/CD pipeline
-   - Auto-deployment
+1. Expand automated tests beyond encoding (scoring and state edge cases)
+2. Add lightweight admin/update workflow for weekly `rankings.json` edits
+3. Improve UX polish for partial-lock and resolved-placement visualization
+4. Add optional share/import helpers for easier group onboarding
 
 ## Project Structure
 
@@ -57,18 +31,21 @@ survivor-50/
 ├── public/
 │   ├── styles.css          # Main stylesheet
 │   ├── data/
-│   │   └── rankings.json   # Contestant data (to be created)
-│   └── images/
-│       └── contestants/    # Placeholder images
+│   │   └── rankings.json   # Contestant results/placements
 └── src/
     ├── main.js             # Preact app entry point
     ├── encoding.js         # Factorial + base62 encoding/decoding
     ├── state.js            # URL state management
     ├── game.js             # Core game logic
-    ├── scoring.js          # Point calculation (Phase 3)
-    └── components/         # Preact components (Phase 2+)
-        ├── Pyramid.js      # Pyramid container
-        └── ContestantCard.js # Card component
+    ├── scoring.js          # Score calculation and ranking fetch
+    └── components/         # Preact UI components
+        ├── ContestantCard.js
+        ├── FriendManager.js
+        ├── FriendPyramid.js
+        ├── Instructions.js
+        ├── Leaderboard.js
+        ├── Pyramid.js
+        └── ScoreDisplay.js
 ```
 
 ## Key Files
@@ -136,15 +113,24 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete setup and updating rankings duri
 
 ## Scoring System
 
-| Placement Range | Points | Description |
+Points for a resolved contestant are calculated with:
+
+`points = min(predictedTierValue, actualTierValue)`
+
+Exception:
+- If a contestant is placed in `Bottom 12`, they score `1` only if they actually finish `13-24`.
+- A `Bottom 12` pick that finishes `1-12` scores `0`.
+- Once the season reaches Top 12 (12 contestants remaining), unresolved `Bottom 12` picks are auto-resolved as `0/1`.
+
+| Placement Range | Tier Value | Description |
 |---|---|---|
 | 1 | 10 | Winner |
-| 2-3 | 4 | Final 2 |
-| 4-6 | 3 | Final 3 |
-| 7-12 | 2 | Top 6 |
+| 2-3 | 5 | Runner-Ups |
+| 4-6 | 3 | Top 6 |
+| 7-12 | 2 | Top 12 |
 | 13-24 | 1 | Bottom 12 |
 
-**Maximum: 48 points** (1×12 + 2×6 + 3×3 + 4×2 + 10×1)
+**Maximum: 53 points** (1×12 + 2×6 + 3×3 + 5×2 + 10×1)
 
 ## Game Mechanics
 
@@ -157,11 +143,9 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete setup and updating rankings duri
 
 ## Next Steps
 
-1. Phase 2: Build pyramid UI with Preact
-2. Phase 3: Create rankings.json and implement scoring
-3. Phase 4: Add leaderboard/friend comparison
-4. Phase 5: Apply Survivor theme styling
-5. Phase 6: Deploy to GitHub Pages
+1. Add tests for progressive scoring scenarios and leaderboard sorting ties
+2. Add a short “weekly update checklist” for maintaining `public/data/rankings.json`
+3. Evaluate whether to split large UI concerns in `main.js` into smaller modules
 
 ## License
 

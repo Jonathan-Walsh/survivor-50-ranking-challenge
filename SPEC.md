@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-**Survivor 50 Fantasy League** is a simple prediction game where players rank 24 Survivor contestants by predicted elimination order. Players earn points when their predictions match the actual elimination order. The entire game state persists in the URL, enabling bookmarking and sharing without a backend.
+**Survivor 50 Fantasy League** is a simple prediction game where players rank 24 Survivor contestants by predicted elimination order. Players earn **progressive, tier-capped points** as actual placements are revealed. The entire game state persists in the URL, enabling bookmarking and sharing without a backend.
 
 ---
 
@@ -33,26 +33,40 @@
 
 ### 2.2 Scoring System
 
-Points awarded when actual elimination matches predicted placement tier:
+Points are based on the predicted placement slot and the contestant's actual final placement.
 
-| Tier | Placement Range | Points per Match | Description |
-|------|-----------------|-----------------|-------------|
-| Bottom 12 | 13-24 | 1 point | Correct prediction of bottom half |
-| Top 6 | 7-12 | 2 points | Correct prediction of late-game placement |
-| Final 3 | 4-6 | 3 points | Correct prediction of jury member |
-| Final 2 | 2-3 | 4 points | Correct prediction of finalist |
-| Winner | 1 | 10 points | Correct winner prediction |
+| Tier | Placement Range | Tier Value | Description |
+|------|-----------------|------------|-------------|
+| Bottom 12 | 13-24 | 1 point | Early-elimination bucket |
+| Top 12 | 7-12 | 2 points | Mid/late-game bucket |
+| Top 6 | 4-6 | 3 points | Deep-run bucket |
+| Runner-Ups | 2-3 | 5 points | Finalist bucket |
+| Winner | 1 | 10 points | Champion bucket |
 
-**Total Possible Points**: Up to **48 points** (12×1 + 6×2 + 3×3 + 2×4 + 1×10)
+**Scoring Formula**: `points = min(predictedTierValue, actualTierValue)` for resolved contestants.
+
+Exception:
+- If predicted tier is Bottom 12, score is `1` only when actual placement is `13-24`; otherwise score is `0`.
+- Once Top 12 is reached (12 contestants still unresolved), unresolved Bottom 12 picks are treated as resolved misses (`0/1`).
+
+Examples:
+- Picked in Top 12 (2), finishes Bottom 12 (1) -> 1 point
+- Picked as Winner (10), finishes Runner-Up (5) -> 5 points
+- Picked as Top 6 (3), finishes Winner (10) -> 3 points
+- Picked in Bottom 12 (1), finishes Top 12 (2) -> 0 points
+
+This means picks can earn partial credit when they underperform the prediction, and cap out at the slot's tier value when they outperform it.
+
+**Total Possible Points**: Up to **53 points** (12×1 + 6×2 + 3×3 + 2×5 + 1×10)
 **Ties Allowed**: Multiple players can achieve the same score
 
-### 2.3 Game Improvements/Recommendations
+### 2.3 Current Rules/Notes
 
-#### Improvement 1: Allow Flexible Scoring Model
-Consider adding an optional "strict mode" where players earn points only if placement is exactly correct (not just tier-correct). This adds difficulty for experienced players.
+#### Rule 1: Single Scoring Mode
+There is no classic/strict scoring mode. The app uses progressive tier-capped scoring only.
 
-#### Improvement 2: Tiebreaker for Ties at Placement Tier
-If multiple players pick identical winner but tie at the final 2 placement, clarify: do both get points? **Recommend**: Yes, both get points. The tier matters, not the exact position within the tier.
+#### Rule 2: No Additional Tiebreaker
+If multiple players have the same score, they remain tied on the leaderboard.
 
 #### Improvement 3: Contestant Identity Options
 Since this is season-specific, provide two modes:
