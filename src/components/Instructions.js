@@ -32,7 +32,7 @@ export function Instructions() {
       ),
       h('div', { className: 'modal-body' },
         h('h3', null, 'The Basics'),
-        h('p', null, 'Welcome to my Survivor 50 Fantasy Draft! Place the Survivor 50 contestants into tiers based on how you think they\'ll perform during the season and receive points based on whether or not your predictions are correct.'),
+        h('p', null, 'Welcome to my Survivor 50 Ranking Challenge! Place the Survivor 50 contestants into tiers based on how you think they\'ll perform during the season and receive points based on whether or not your predictions are correct.'),
         h('p', null, 'The game has five tiers:'),
         h('ul', null,
           h('li', null, 'Winner (1 spot) - 10 points'),
