@@ -8,19 +8,19 @@ const { useState, useEffect } = window.preactHooks;
 
 import { calculateScore, fetchRankings } from '../scoring.js';
 
-export function ScoreDisplay({ permutation }) {
+export function ScoreDisplay({ permutation, scoringMode }) {
   const [currentScore, setCurrentScore] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchRankings().then((data) => {
       if (data.length > 0) {
-        const score = calculateScore(permutation, data);
+        const score = calculateScore(permutation, data, scoringMode);
         setCurrentScore(score.currentScore);
       }
       setLoading(false);
     });
-  }, [permutation]);
+  }, [permutation, scoringMode]);
 
   if (loading) {
     return h('div', { className: 'score-display' }, 'Loading...');

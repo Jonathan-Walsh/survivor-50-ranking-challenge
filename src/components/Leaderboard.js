@@ -8,7 +8,7 @@ const { useState, useEffect } = window.preactHooks;
 
 import { calculateScore, fetchRankings } from '../scoring.js';
 
-export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
+export function Leaderboard({ players, scoringMode, selectedPlayerKey, onSelectPlayer }) {
   const [standings, setStandings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +25,7 @@ export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
         .filter((p) => p && Array.isArray(p.permutation) && p.permutation.length === 24)
         .map((p) => ({
           ...p,
-          ...calculateScore(p.permutation, rankings),
+          ...calculateScore(p.permutation, rankings, scoringMode),
         }))
         .sort((a, b) => {
           if (a.currentScore !== b.currentScore) return b.currentScore - a.currentScore;
@@ -41,7 +41,7 @@ export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
     return () => {
       cancelled = true;
     };
-  }, [players]);
+  }, [players, scoringMode]);
 
   return h(
     'div',

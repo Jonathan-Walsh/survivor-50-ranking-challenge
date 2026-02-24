@@ -2,7 +2,7 @@
  * State Module - URL State Management
  *
  * Handles reading and writing game state to/from URL hash
- * Format: #p=CODE&n=NAME&f=CODE1:NAME1,CODE2:NAME2
+ * Format: #p=CODE&n=NAME&f=CODE1:NAME1,CODE2:NAME2&m=MODE
  */
 
 import { encodePermutation, decodePermutation } from './encoding.js';
@@ -25,7 +25,7 @@ export function parseHash() {
 
 /**
  * Serialize state to URL hash
- * @param {Object} state - State object with keys: p, n, f
+ * @param {Object} state - State object with keys: p, n, f, m
  */
 export function serializeHash(state) {
   const params = [];
@@ -35,6 +35,7 @@ export function serializeHash(state) {
   if (state.f && state.f.length > 0) {
     params.push(`f=${encodeURIComponent(state.f)}`);
   }
+  if (state.m) params.push(`m=${encodeURIComponent(state.m)}`);
 
   const newHash = '#' + params.join('&');
   window.location.hash = newHash;
@@ -96,8 +97,9 @@ export function parseFriendCodes(friendString) {
  * @param {number[]} permutation - Player's predictions [1-24]
  * @param {string} playerName - Player's name
  * @param {Array} friends - Friend list [{ code, name }, ...]
+ * @param {string} scoringMode - 'classic' | 'progressive'
  */
-export function savePlayerPrediction(permutation, playerName, friends = []) {
+export function savePlayerPrediction(permutation, playerName, friends = [], scoringMode = 'classic') {
   const code = encodePermutation(permutation);
   const friendString = friends.map((f) => `${f.code}:${f.name}`).join(',');
 
@@ -105,6 +107,7 @@ export function savePlayerPrediction(permutation, playerName, friends = []) {
     p: code,
     n: playerName,
     f: friendString,
+    m: scoringMode,
   });
 
   return code;
@@ -167,6 +170,9 @@ export function copyPlayerCodeToClipboard() {
   hashParams.set('n', params.n || 'Player');
   if (params.f) {
     hashParams.set('f', params.f);
+  }
+  if (params.m) {
+    hashParams.set('m', params.m);
   }
 
   const shareUrl = `${window.location.origin}${window.location.pathname}#${hashParams.toString()}`;

@@ -128,6 +128,25 @@ body {
   border-color: var(--sand);
 }
 
+.scoring-mode-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--white);
+}
+
+.scoring-mode-select:focus {
+  outline: none;
+  border-color: var(--sand);
+}
+
+.text-muted-small {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 /* Score display */
 .score-display {
   display: flex;
@@ -367,11 +386,15 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.contestant-card.contestant-card-correct {
+.contestant-card.contestant-card-exact {
   background: #e8f7ec;
 }
 
-.contestant-card.contestant-card-wrong {
+.contestant-card.contestant-card-partial {
+  background: #fff8e6;
+}
+
+.contestant-card.contestant-card-miss {
   background: #fdecee;
 }
 
@@ -424,6 +447,16 @@ body {
 .contestant-name {
   font-size: 0.8rem;
   line-height: 1.2;
+}
+
+.contestant-score-badge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1px 6px;
 }
 
 /* Friends */

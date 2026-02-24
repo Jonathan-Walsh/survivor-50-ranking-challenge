@@ -6,7 +6,9 @@
 const { h } = window.preact;
 const { useState } = window.preactHooks;
 
-export function Instructions() {
+import { SCORING_MODES } from '../scoring.js';
+
+export function Instructions({ scoringMode = SCORING_MODES.PROGRESSIVE }) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!isOpen) {
@@ -41,7 +43,9 @@ export function Instructions() {
           h('li', null, 'Bottom 12 (12 spots) - 1 point each')
         ),
         h('h3', null, 'How Scoring Works'),
-        h('p', null, 'You earn points when contestants are voted out and match your predicted tier. If you guess someone is a Runner-Up and they are, you get 4 points. If they get voted out before that, you get 0 points.'),
+        scoringMode === SCORING_MODES.PROGRESSIVE
+          ? h('p', null, 'Progressive mode: you earn up to your tier value. Example: pick Top 12 and get 1 point if they finish Bottom 12, or 2 points if they finish Top 12 or better. Pick Winner and score scales by exact finish (1st = 10, 2nd = 9, ... 10th+ = 1).')
+          : h('p', null, 'Classic mode: you only score when the predicted tier matches exactly. If you guess someone is a Runner-Up and they are, you get 4 points. If they finish in another tier, you get 0 points.'),
         h('h3', null, 'Playing the Game'),
         h('ol', null,
           h('li', null, 'Drag contestants from the pool into tiers'),
@@ -52,7 +56,9 @@ export function Instructions() {
         ),
         h('h3', null, 'Key Points'),
         h('ul', null,
-          h('li', null, 'You only get points if the tier matches exactly'),
+          h('li', null, scoringMode === SCORING_MODES.PROGRESSIVE
+            ? 'Progressive mode gives partial credit up to your selected tier'
+            : 'Classic mode only gives points on exact tier matches'),
           h('li', null, 'Maximum possible score: 48 points'),
           h('li', null, 'Your link saves everything - bookmark it'),
           h('li', null, 'Add friend codes to compare scores')

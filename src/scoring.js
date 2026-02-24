@@ -6,6 +6,11 @@
 
 import { getTierInfo } from './game.js';
 
+export const SCORING_MODES = {
+  CLASSIC: 'classic',
+  PROGRESSIVE: 'progressive',
+};
+
 /**
  * Get points for a contestant based on their placement
  * @param {number} placement - Actual placement (1-24, or null)
@@ -18,18 +23,45 @@ export function getPointsForPlacement(placement) {
 }
 
 /**
+ * Get points for a predicted placement vs actual placement.
+ * Classic: exact-tier only.
+ * Progressive: partial credit up to predicted tier cap.
+ * @param {number} predictedPlacement
+ * @param {number|null} actualPlacement
+ * @param {string} mode
+ * @returns {number}
+ */
+export function getPointsForMatch(predictedPlacement, actualPlacement, mode = SCORING_MODES.CLASSIC) {
+  if (actualPlacement === null || actualPlacement === undefined) return 0;
+
+  const predictedTier = getTierInfo(predictedPlacement);
+  const actualTier = getTierInfo(actualPlacement);
+  if (!predictedTier || !actualTier) return 0;
+
+  if (mode === SCORING_MODES.PROGRESSIVE) {
+    // Winner slot uses linear points by exact finish (1st=10 ... 10th+=1)
+    if (predictedTier.tier === 1) {
+      return Math.max(1, 11 - actualPlacement);
+    }
+    return Math.min(predictedTier.points, actualTier.points);
+  }
+
+  return predictedTier.tier === actualTier.tier ? predictedTier.points : 0;
+}
+
+/**
  * Calculate score for a player's predictions
  * @param {number[]} permutation - Player's predictions [1-24]
  * @param {Array} rankings - Actual placement data from rankings.json
  * @returns {Object} - { currentScore, maxPossibleScore, breakdown }
  */
-export function calculateScore(permutation, rankings) {
+export function calculateScore(permutation, rankings, mode = SCORING_MODES.CLASSIC) {
   let currentScore = 0;
-  let totalPossibleScore = 0;
-  let pointsLost = 0;
+  let maxPossibleScore = 0;
   const breakdown = {
-    correct: [],
-    incorrect: [],
+    exact: [],
+    partial: [],
+    miss: [],
     unresolved: [],
   };
 
@@ -43,8 +75,8 @@ export function calculateScore(permutation, rankings) {
     if (!contestant) continue;
 
     const tierInfo = getTierInfo(predictedPlacement);
-    const maxPoints = tierInfo.points;
-    totalPossibleScore += maxPoints;
+    const maxPoints = tierInfo ? tierInfo.points : 0;
+    maxPossibleScore += maxPoints;
 
     if (contestant.placement === null) {
       // Not yet resolved
@@ -55,34 +87,34 @@ export function calculateScore(permutation, rankings) {
         potentialPoints: maxPoints,
       });
     } else {
-      // Check if in correct tier
+      const earnedPoints = getPointsForMatch(predictedPlacement, contestant.placement, mode);
       const actualTier = getTierInfo(contestant.placement);
-      const isCorrect = actualTier.tier === tierInfo.tier;
+      currentScore += earnedPoints;
 
-      if (isCorrect) {
-        currentScore += maxPoints;
-        breakdown.correct.push({
-          id: contestantId,
-          name: contestant.name,
-          predictedTier: tierInfo.name,
-          actualPlacement: contestant.placement,
-          points: maxPoints,
-        });
+      // Once resolved, potential equals what was actually earned.
+      maxPossibleScore -= maxPoints;
+      maxPossibleScore += earnedPoints;
+
+      const detail = {
+        id: contestantId,
+        name: contestant.name,
+        predictedTier: tierInfo.name,
+        actualTier: actualTier ? actualTier.name : null,
+        actualPlacement: contestant.placement,
+        points: earnedPoints,
+        maxPoints,
+      };
+
+      if (earnedPoints === maxPoints) {
+        breakdown.exact.push(detail);
+      } else if (earnedPoints > 0) {
+        breakdown.partial.push(detail);
       } else {
-        pointsLost += maxPoints;
-        breakdown.incorrect.push({
-          id: contestantId,
-          name: contestant.name,
-          predictedTier: tierInfo.name,
-          actualTier: actualTier.name,
-          actualPlacement: contestant.placement,
-          points: 0,
-        });
+        breakdown.miss.push(detail);
       }
     }
   }
 
-  const maxPossibleScore = totalPossibleScore - pointsLost;
   const potentialRemaining = maxPossibleScore - currentScore;
 
   return {
@@ -101,9 +133,9 @@ export function calculateScore(permutation, rankings) {
  * @param {Array} rankings - Actual placement data
  * @returns {Array} - Sorted by score descending
  */
-export function compareScores(players, rankings) {
+export function compareScores(players, rankings, mode = SCORING_MODES.CLASSIC) {
   const scores = players.map((player) => {
-    const scoreData = calculateScore(player.permutation, rankings);
+    const scoreData = calculateScore(player.permutation, rankings, mode);
     return {
       name: player.name,
       code: player.code,

@@ -13,6 +13,7 @@ export function ContestantCard({
   isDragging,
   draggable = true,
   status = null,
+  scoreBadge = null,
   tribe = null,
 }) {
   const statusClass = status ? `contestant-card-${status}` : '';
@@ -30,6 +31,7 @@ export function ContestantCard({
         ? h('img', { src: imageUrl, alt: name })
         : h('div', { className: 'placeholder' }, id)
     ),
-    h('span', { className: 'contestant-name' }, name)
+    h('span', { className: 'contestant-name' }, name),
+    scoreBadge && h('span', { className: 'contestant-score-badge' }, scoreBadge)
   );
 }
