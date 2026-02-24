@@ -5,11 +5,12 @@
 
 const { h } = window.preact;
 
-export function ContestantCard({ id, name, imageUrl, onDragStart, isDragging, draggable = true }) {
+export function ContestantCard({ id, name, imageUrl, onDragStart, isDragging, draggable = true, status = null }) {
+  const statusClass = status ? `contestant-card-${status}` : '';
   return h(
     'div',
     {
-      className: `contestant-card ${isDragging ? 'dragging' : ''}`,
+      className: `contestant-card ${isDragging ? 'dragging' : ''} ${statusClass}`.trim(),
       draggable,
       onDragStart: draggable && onDragStart ? (e) => onDragStart(e, id) : undefined,
       'data-contestant-id': id,

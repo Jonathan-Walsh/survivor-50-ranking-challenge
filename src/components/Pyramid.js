@@ -11,14 +11,14 @@ const { h } = window.preact;
 const { useState, useEffect, useCallback } = window.preactHooks;
 
 import { ContestantCard } from './ContestantCard.js';
-import { getTierRange } from '../game.js';
+import { getTierInfo, getTierRange } from '../game.js';
 
 const TIER_ORDER = [1, 2, 3, 4, 5];
 
 /**
  * Tier Component (one row of the pyramid)
  */
-function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly }) {
+function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly, statusById }) {
   const tierInfo = getTierRange(tierNum);
   const spotsLeft = maxSlots - contestants.length;
 
@@ -50,6 +50,7 @@ function Tier({ tierNum, contestants, maxSlots, onDrop, onDragOver, readOnly }) 
               name: c.name,
               imageUrl: c.imageUrl,
               draggable: !readOnly,
+              status: statusById[c.id] || null,
               onDragStart: (e, id) => {
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', String(id));
@@ -133,15 +134,64 @@ function tiersToPermutation(tierMap) {
   return perm;
 }
 
+function buildStatusById(tierMap, rankings) {
+  if (!Array.isArray(rankings) || rankings.length === 0) return {};
+
+  const placementById = new Map();
+  const knownPlacements = new Set();
+  for (const c of rankings) {
+    placementById.set(c.id, c.placement);
+    if (c.placement !== null && c.placement !== undefined) {
+      knownPlacements.add(c.placement);
+    }
+  }
+
+  const tierResolved = {};
+  for (const tierNum of TIER_ORDER) {
+    const { min, max } = getTierRange(tierNum);
+    let resolved = true;
+    for (let placement = min; placement <= max; placement++) {
+      if (!knownPlacements.has(placement)) {
+        resolved = false;
+        break;
+      }
+    }
+    tierResolved[tierNum] = resolved;
+  }
+
+  const statusById = {};
+  for (const tierNum of TIER_ORDER) {
+    for (const id of tierMap[tierNum]) {
+      const placement = placementById.get(id);
+      if (placement !== null && placement !== undefined) {
+        const actualTier = getTierInfo(placement);
+        statusById[id] = actualTier && actualTier.tier === tierNum ? 'correct' : 'wrong';
+      } else if (tierResolved[tierNum]) {
+        statusById[id] = 'wrong';
+      }
+    }
+  }
+
+  return statusById;
+}
+
 /**
  * Main Pyramid Component
  */
-export function Pyramid({ contestants, onPermutationChange, initialPermutation, readOnly = false, title = 'Your Predictions' }) {
+export function Pyramid({
+  contestants,
+  onPermutationChange,
+  initialPermutation,
+  readOnly = false,
+  title = 'Your Predictions',
+  rankings = [],
+}) {
   const [tierMap, setTierMap] = useState(() => buildInitialTiers(contestants, initialPermutation));
 
   // Lookup table: id → contestant object
   const contestantById = {};
   for (const c of contestants) contestantById[c.id] = c;
+  const statusById = buildStatusById(tierMap, rankings);
 
   // Whenever tierMap changes, push a fresh permutation up to parent
   useEffect(() => {
@@ -201,6 +251,7 @@ export function Pyramid({ contestants, onPermutationChange, initialPermutation, 
           onDrop: handleDrop,
           onDragOver: handleDragOver,
           readOnly,
+          statusById,
         });
       })
     ),

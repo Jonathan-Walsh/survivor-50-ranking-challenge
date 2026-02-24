@@ -316,6 +316,16 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+.contestant-card.contestant-card-correct {
+  border-color: #2b8a3e;
+  background: #e8f7ec;
+}
+
+.contestant-card.contestant-card-wrong {
+  border-color: #b02a37;
+  background: #fdecee;
+}
+
 .contestant-card.dragging {
   opacity: 0.5;
   cursor: grabbing;

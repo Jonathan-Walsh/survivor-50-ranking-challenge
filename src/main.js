@@ -12,6 +12,7 @@ import { Pyramid } from './components/Pyramid.js';
 import { Leaderboard } from './components/Leaderboard.js';
 import { FriendManager } from './components/FriendManager.js';
 import { Instructions } from './components/Instructions.js';
+import { fetchRankings } from './scoring.js';
 
 const CONTESTANTS = [
   { id: 1, name: 'Angelina' },
@@ -45,6 +46,7 @@ function App() {
   const [playerName, setPlayerName] = useState('Player');
   const [playerCode, setPlayerCode] = useState(null);
   const [friends, setFriends] = useState([]);
+  const [rankings, setRankings] = useState([]);
   // viewingPlayer: null = viewing own picks, otherwise { name, permutation, code }
   const [viewingPlayer, setViewingPlayer] = useState(null);
 
@@ -67,6 +69,12 @@ function App() {
       setPlayerCode(params.get('p') || (saved.permutation ? encodePermutation(saved.permutation) : null));
     }
     setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchRankings().then((data) => {
+      setRankings(data || []);
+    });
   }, []);
 
   // Stable callback — Pyramid calls this on every drag
@@ -137,6 +145,7 @@ function App() {
             initialPermutation: activePermutation,
             readOnly: isViewingFriend,
             title: pyramidTitle,
+            rankings,
           }),
           isViewingFriend && h('div', { style: 'margin-top: 8px;' },
             h('button', {
