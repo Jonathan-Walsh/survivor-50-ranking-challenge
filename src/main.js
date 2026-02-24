@@ -172,7 +172,7 @@ function App() {
     { className: 'app' },
     h('header', { className: 'header' },
       h('div', { className: 'header-row' },
-        h('h1', null, 'Survivor 50 Fantasy League'),
+        h('h1', null, 'Survivor 50 Ranking Challenge'),
         h(Instructions)
       )
     ),

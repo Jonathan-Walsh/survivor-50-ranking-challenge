@@ -1,4 +1,4 @@
-# Survivor 50 Fantasy League
+# Survivor 50 Ranking Challenge
 
 A simple prediction game where players rank Survivor contestants and earn progressive, tier-capped points as placements are revealed. All game state persists in the URL, enabling bookmarking and sharing without a backend.
 

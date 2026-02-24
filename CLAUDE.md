@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Survivor 50 Fantasy League** - A web-based game where players rank Survivor season 50 contestants and earn points based on how accurately they predict elimination order.
+**Survivor 50 Ranking Challenge** - A web-based game where players rank Survivor season 50 contestants and earn points based on how accurately they predict elimination order.
 
 See `task.md` for the complete project specification and planning requirements.
 

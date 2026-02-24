@@ -1,6 +1,6 @@
-# Deployment Guide - Survivor 50 Fantasy League
+# Deployment Guide - Survivor 50 Ranking Challenge
 
-This guide covers deploying the Survivor 50 Fantasy League to GitHub Pages.
+This guide covers deploying the Survivor 50 Ranking Challenge to GitHub Pages.
 
 ## Prerequisites
 

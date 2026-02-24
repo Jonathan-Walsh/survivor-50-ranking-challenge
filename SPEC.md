@@ -1,8 +1,8 @@
-# Survivor 50 Fantasy League - Specification Document
+# Survivor 50 Ranking Challenge - Specification Document
 
 ## 1. Overview
 
-**Survivor 50 Fantasy League** is a simple prediction game where players rank 24 Survivor contestants by predicted elimination order. Players earn **progressive, tier-capped points** as actual placements are revealed. The entire game state persists in the URL, enabling bookmarking and sharing without a backend.
+**Survivor 50 Ranking Challenge** is a simple prediction game where players rank 24 Survivor contestants by predicted elimination order. Players earn **progressive, tier-capped points** as actual placements are revealed. The entire game state persists in the URL, enabling bookmarking and sharing without a backend.
 
 ---
 

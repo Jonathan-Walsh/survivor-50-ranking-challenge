@@ -1,7 +1,7 @@
 {
-  "name": "survivor-50-fantasy",
+  "name": "survivor-50-ranking-challenge",
   "version": "0.1.0",
-  "description": "A simple fantasy league game for Survivor Season 50",
+  "description": "A Survivor Season 50 ranking challenge game",
   "type": "module",
   "scripts": {
     "start": "python -m http.server 8000",
