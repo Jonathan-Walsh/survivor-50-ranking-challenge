@@ -67,16 +67,16 @@ export function FriendManager({
       { onSubmit: handleAddFriend, className: 'friend-form' },
       h('input', {
         type: 'text',
-        value: friendCode,
-        onChange: (e) => setFriendCode(e.target.value),
-        placeholder: 'Friend code (14 chars)',
-        maxLength: 14,
-      }),
-      h('input', {
-        type: 'text',
         value: friendName,
         onChange: (e) => setFriendName(e.target.value),
         placeholder: 'Name',
+      }),
+      h('input', {
+        type: 'text',
+        value: friendCode,
+        onChange: (e) => setFriendCode(e.target.value),
+        placeholder: 'Friend code (14 characters)',
+        maxLength: 14,
       }),
       error && h('div', { className: 'error-message' }, error),
       h('button', { type: 'submit', className: 'btn btn-secondary btn-small' }, 'Add')

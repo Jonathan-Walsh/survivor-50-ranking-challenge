@@ -22,11 +22,27 @@ export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
       if (cancelled) return;
 
       const scoredPlayers = (players || [])
-        .filter((p) => p && Array.isArray(p.permutation) && p.permutation.length === 24)
-        .map((p) => ({
-          ...p,
-          ...calculateScore(p.permutation, rankings),
-        }))
+        .filter((p) => p)
+        .map((p) => {
+          const hasCompletePicks = (
+            Array.isArray(p.permutation) &&
+            p.permutation.length === 24 &&
+            (!p.isSelf || Boolean(p.code))
+          );
+
+          if (!hasCompletePicks) {
+            return {
+              ...p,
+              currentScore: 0,
+              maxPossibleScore: 0,
+            };
+          }
+
+          return {
+            ...p,
+            ...calculateScore(p.permutation, rankings),
+          };
+        })
         .sort((a, b) => {
           if (a.currentScore !== b.currentScore) return b.currentScore - a.currentScore;
           if (a.maxPossibleScore !== b.maxPossibleScore) return b.maxPossibleScore - a.maxPossibleScore;

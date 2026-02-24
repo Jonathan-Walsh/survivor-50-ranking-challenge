@@ -22,30 +22,33 @@ import { Instructions } from './components/Instructions.js';
 import { fetchRankings } from './scoring.js';
 
 const CONTESTANTS = [
-  { id: 1, name: 'Angelina', tribe: 'cila' },
-  { id: 2, name: 'Aubry', tribe: 'cila' },
-  { id: 3, name: 'Coach', tribe: 'cila' },
-  { id: 4, name: 'Charlie', tribe: 'cila' },
-  { id: 5, name: 'Chrissy', tribe: 'cila' },
+  // Cila (orange)
+  { id: 13, name: 'Joe', tribe: 'cila' },
+  { id: 22, name: 'Savannah', tribe: 'cila' },
   { id: 6, name: 'Christian', tribe: 'cila' },
   { id: 7, name: 'Cirie', tribe: 'cila' },
-  { id: 8, name: 'Colby', tribe: 'cila' },
-  { id: 9, name: 'Dee', tribe: 'kalo' },
-  { id: 10, name: 'Emily', tribe: 'kalo' },
-  { id: 11, name: 'Genevieve', tribe: 'kalo' },
-  { id: 12, name: 'Jenna', tribe: 'kalo' },
-  { id: 13, name: 'Joe', tribe: 'kalo' },
+  { id: 18, name: 'Ozzy', tribe: 'cila' },
+  { id: 10, name: 'Emily', tribe: 'cila' },
+  { id: 20, name: 'Rick', tribe: 'cila' },
+  { id: 12, name: 'Jenna', tribe: 'cila' },
+  // Kalo (teal)
   { id: 14, name: 'Jonathan', tribe: 'kalo' },
+  { id: 9, name: 'Dee', tribe: 'kalo' },
+  { id: 17, name: 'Mike', tribe: 'kalo' },
   { id: 15, name: 'Kamilla', tribe: 'kalo' },
-  { id: 16, name: 'Kyle', tribe: 'kalo' },
-  { id: 17, name: 'Mike', tribe: 'vatu' },
-  { id: 18, name: 'Ozzy', tribe: 'vatu' },
-  { id: 19, name: 'Q', tribe: 'vatu' },
-  { id: 20, name: 'Rick', tribe: 'vatu' },
+  { id: 4, name: 'Charlie', tribe: 'kalo' },
+  { id: 24, name: 'Tiffany', tribe: 'kalo' },
+  { id: 3, name: 'Coach', tribe: 'kalo' },
+  { id: 5, name: 'Chrissy', tribe: 'kalo' },
+  // Vatu (pink/magenta)
+  { id: 8, name: 'Colby', tribe: 'vatu' },
+  { id: 11, name: 'Genevieve', tribe: 'vatu' },
   { id: 21, name: 'Rizo', tribe: 'vatu' },
-  { id: 22, name: 'Savannah', tribe: 'vatu' },
+  { id: 1, name: 'Angelina', tribe: 'vatu' },
+  { id: 19, name: 'Q', tribe: 'vatu' },
   { id: 23, name: 'Stephenie', tribe: 'vatu' },
-  { id: 24, name: 'Tiffany', tribe: 'vatu' },
+  { id: 16, name: 'Kyle', tribe: 'vatu' },
+  { id: 2, name: 'Aubry', tribe: 'vatu' },
 ].map((c) => ({ ...c, imageUrl: null }));
 
 function App() {

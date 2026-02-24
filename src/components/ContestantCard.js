@@ -8,7 +8,6 @@ const { h } = window.preact;
 export function ContestantCard({
   id,
   name,
-  imageUrl,
   onDragStart,
   isDragging,
   draggable = true,
@@ -27,11 +26,6 @@ export function ContestantCard({
       onDragStart: draggable && onDragStart ? (e) => onDragStart(e, id) : undefined,
       'data-contestant-id': id,
     },
-    h('div', { className: 'contestant-image' },
-      imageUrl
-        ? h('img', { src: imageUrl, alt: name })
-        : h('div', { className: 'placeholder' }, id)
-    ),
     h('span', { className: 'contestant-name' }, name),
     placementLabel && h('span', { className: 'contestant-placement-badge' }, placementLabel),
     scoreBadge && h('span', { className: 'contestant-score-badge' }, scoreBadge)
