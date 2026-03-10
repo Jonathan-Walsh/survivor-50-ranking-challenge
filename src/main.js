@@ -12,6 +12,7 @@ import {
   parseHash,
   parseFriendCodes,
   serializeHash,
+  removeFriend,
 } from './state.js';
 import { createInitialPermutation } from './game.js';
 import { decodePermutation } from './encoding.js';
@@ -147,6 +148,14 @@ function App() {
     setFriends((prev) => [...prev, newFriend]);
   };
 
+  const handleRemoveFriend = (player) => {
+    removeFriend(player.code);
+    setFriends((prev) => prev.filter((f) => f.code !== player.code));
+    if (viewingPlayer && viewingPlayer.code === player.code) {
+      setViewingPlayer(null);
+    }
+  };
+
   const handleViewPlayer = (player) => {
     if (player === null) {
       // Back to own picks
@@ -231,6 +240,7 @@ function App() {
               players: allPlayers,
               selectedPlayerKey: isViewingFriend ? viewingPlayer.viewKey : 'self',
               onSelectPlayer: (player) => player.isSelf ? handleViewPlayer(null) : handleViewPlayer(player),
+              onRemovePlayer: handleRemoveFriend,
             })
           ),
           // Add friend

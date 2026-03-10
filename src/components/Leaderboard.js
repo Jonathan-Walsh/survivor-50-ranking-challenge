@@ -8,7 +8,7 @@ const { useState, useEffect } = window.preactHooks;
 
 import { calculateScore, fetchRankings } from '../scoring.js';
 
-export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
+export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer, onRemovePlayer }) {
   const [standings, setStandings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,7 +74,8 @@ export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
               h('tr', null,
                 h('th', { scope: 'col' }, 'Name'),
                 h('th', { scope: 'col' }, 'Current Score'),
-                h('th', { scope: 'col' }, 'Max Possible Score')
+                h('th', { scope: 'col' }, 'Max Possible Score'),
+                h('th', { scope: 'col' })
               )
             ),
             h('tbody', null,
@@ -87,7 +88,14 @@ export function Leaderboard({ players, selectedPlayerKey, onSelectPlayer }) {
                 },
                 h('td', null, `${player.name}${player.isSelf ? ' (you)' : ''}`),
                 h('td', { className: 'col-score' }, String(player.currentScore)),
-                h('td', { className: 'col-score' }, String(player.maxPossibleScore))
+                h('td', { className: 'col-score' }, String(player.maxPossibleScore)),
+                h('td', { className: 'col-remove' },
+                  !player.isSelf && onRemovePlayer && h('button', {
+                    className: 'btn-remove',
+                    title: `Remove ${player.name}`,
+                    onClick: (e) => { e.stopPropagation(); onRemovePlayer(player); },
+                  }, '\u00d7')
+                )
                 );
               })
             )
