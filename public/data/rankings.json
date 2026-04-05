@@ -6,7 +6,7 @@
     {
       "id": 1,
       "name": "Angelina Keeley",
-      "placement": null
+      "placement": 19
     },
     {
       "id": 2,
@@ -21,7 +21,7 @@
     {
       "id": 4,
       "name": "Charlie Davis",
-      "placement": null
+      "placement": 18
     },
     {
       "id": 5,
@@ -41,7 +41,7 @@
     {
       "id": 8,
       "name": "Colby Donaldson",
-      "placement": null
+      "placement": 15
     },
     {
       "id": 9,
@@ -56,7 +56,7 @@
     {
       "id": 11,
       "name": "Genevieve Mushaluk",
-      "placement": null
+      "placement": 16
     },
     {
       "id": 12,
@@ -76,7 +76,7 @@
     {
       "id": 15,
       "name": "Kamilla Karthigesu",
-      "placement": null
+      "placement": 17
     },
     {
       "id": 16,
